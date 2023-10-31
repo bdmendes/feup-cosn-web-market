@@ -57,6 +57,12 @@ The proposed API aims to follow REST principles and be easy to use and understan
 
 #### Consumer Service
 
+This service aims to manage informations on the consumers using our platform.
+
+It provides CRUD operations for clients' billing information and addresses as well as keeping the each client's current shopping basket. 
+
+This service also implements functionality to get the best products for a client at the best value, with alarms for price drops, recomendations on each product category based on consumer preference and habits and recommended shopping carts using consumer defined parameters. To do so it uses information from past orders, desired or/and requested products and dynamic pricing, leveraging sales.
+
 ```json
 {
   "openapi": "3.1.0",
@@ -472,6 +478,12 @@ Unique endpoint to comunicate with an extern delivery service in order to perfor
 
 #### Orders Service
 
+This service manages all the orders for the platform, keeping a repository of past orders.
+
+Orders might be on-demand, scheduled or created automatically given certain consumer-defined parameters (in the case of surprise boxes).
+
+Order cancellation or updates are only allowed if the payment wasn't yet processed. After being authorized, the order supports only state updates.
+
 ```json
 {
   "openapi": "3.1.0",
@@ -652,3 +664,4 @@ We are expecting other subsystems to allow, in a documented way, the following i
 
 - *Stock Service*: we need to be able to query the stock of a given product, and to be notified when the stock of a given product changes. This may be done using a message queue, for example.
 - External payment service: we need to be able to pay an order using a given payment method.
+- External delivery provider: we need to be able to programmatically request delivery of our orders using a delivery provider.
