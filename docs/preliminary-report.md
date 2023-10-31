@@ -434,7 +434,7 @@ This service also implements functionality to get the best products for a client
 
 #### Delivery Service
 
-Unique endpoint to comunicate with an extern delivery service in order to perform the delivery of the purchased products.
+This service communicates with an external service to orchestrate the delivery process of an order.
 
 ```json
 {
@@ -610,7 +610,7 @@ Order cancellation or updates are only allowed if the payment wasn't yet process
 
 #### Payments Service
 
-Unique endpoint to comunicate with an extern payment service in order to perform a purchase. A mock payment service will be used to emulate a real world scenario.
+This service communicates with a payment service to charge the client and accept an order.
 
 ```json
 {
