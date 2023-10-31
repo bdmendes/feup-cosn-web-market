@@ -428,6 +428,8 @@ The proposed API aims to follow REST principles and be easy to use and understan
 
 #### Delivery Service
 
+Unique endpoint to comunicate with an extern delivery service in order to perform the delivery of the purchased products.
+
 ```json
 {
   "openapi": "3.1.0",
@@ -595,6 +597,8 @@ The proposed API aims to follow REST principles and be easy to use and understan
 ```
 
 #### Payments Service
+
+Unique endpoint to comunicate with an extern payment service in order to perform a purchase. A mock payment service will be used to emulate a real world scenario.
 
 ```json
 {
