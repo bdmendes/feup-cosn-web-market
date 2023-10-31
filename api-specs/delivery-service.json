@@ -1,0 +1,42 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Delivery service",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/delivery": {
+            "post": {
+                "summary": "Delivery request",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "order_id": 3,
+                                "delivery_address": "123 Main St, City"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Delivery request successful",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Delivery request placed"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "x-readme": {
+        "explorer-enabled": true,
+        "proxy-enabled": true,
+        "samples-enabled": true
+    }
+}

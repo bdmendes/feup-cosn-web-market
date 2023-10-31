@@ -1,0 +1,371 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Consumers service",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/consumers": {
+            "post": {
+                "summary": "Create a new Consumer",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "name": "John Doe",
+                                "email": "johndoe@example.com"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Consumer created successfully",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "consumer_id": 4
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/consumers/{id}": {
+            "get": {
+                "summary": "Get consumer information",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "consumer_id": 4,
+                                    "name": "John Doe",
+                                    "email": "johndoe@example.com"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update consumer information",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "name": "Updated Name"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Consumer information updated successfully",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Consumer information updated"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete consumer information",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Consumer information deleted successfully"
+                    }
+                }
+            }
+        },
+        "/api/consumers/{id}/shopping-cart": {
+            "get": {
+                "summary": "Get shopping cart of a consumer",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "shopping_cart": [
+                                        {
+                                            "product_id": 456,
+                                            "name": "Product A",
+                                            "quantity": 2
+                                        },
+                                        {
+                                            "product_id": 789,
+                                            "name": "Product B",
+                                            "quantity": 1
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update consumer's shopping cart",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "shopping_cart": [
+                                    {
+                                        "product_id": 456,
+                                        "quantity": 3
+                                    },
+                                    {
+                                        "product_id": 789,
+                                        "quantity": 2
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Shopping cart updated successfully",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Shopping cart updated"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Clear shopping cart",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Shopping cart cleared successfully"
+                    }
+                }
+            }
+        },
+        "/api/notifications/clients/{id}": {
+            "post": {
+                "summary": "Register for price drop notifications on a given product",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "product_id": 456,
+                                "threshold_price": 50
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Notification registration successful",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Notification registered"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "summary": "Get registered price drop notifications",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "notifications": [
+                                        {
+                                            "product_id": 456,
+                                            "threshold_price": 50
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/recomendations/clients/{users}": {
+            "get": {
+                "summary": "Get recommended products",
+                "parameters": [
+                    {
+                        "name": "users",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "recommendations": [
+                                        {
+                                            "product_id": 123,
+                                            "name": "Recommended Product 1"
+                                        },
+                                        {
+                                            "product_id": 789,
+                                            "name": "Recommended Product 2"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/recomendation/clients/{id}": {
+            "get": {
+                "summary": "Get recommended shopping-cart",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "shopping_cart": [
+                                        {
+                                            "product_id": 123,
+                                            "name": "Recommended Product 1"
+                                        },
+                                        {
+                                            "product_id": 789,
+                                            "name": "Recommended Product 2"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "x-readme": {
+        "explorer-enabled": true,
+        "proxy-enabled": true,
+        "samples-enabled": true
+    }
+}

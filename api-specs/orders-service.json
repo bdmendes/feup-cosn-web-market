@@ -1,0 +1,126 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Orders service",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/orders/clients/{id}": {
+            "get": {
+                "summary": "Get all the orders of a client",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "orders": [
+                                        {
+                                            "order_id": 1,
+                                            "client_id": 123,
+                                            "status": "Pending"
+                                        },
+                                        {
+                                            "order_id": 2,
+                                            "client_id": 123,
+                                            "status": "Shipped"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/orders": {
+            "post": {
+                "summary": "Submit a new order",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "client_id": 123,
+                                "products": [
+                                    {
+                                        "product_id": 456,
+                                        "quantity": 2
+                                    },
+                                    {
+                                        "product_id": 789,
+                                        "quantity": 1
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Order created successfully",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "order_id": 3
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/orders/{id}": {
+            "put": {
+                "summary": "Update an existing order (status update or cancellation)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "status": "Cancelled"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Order updated successfully",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Order status updated to Cancelled"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "x-readme": {
+        "explorer-enabled": true,
+        "proxy-enabled": true,
+        "samples-enabled": true
+    }
+}

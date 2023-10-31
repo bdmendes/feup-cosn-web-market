@@ -1,0 +1,43 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Payment service",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/payment": {
+            "post": {
+                "summary": "Order payment",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "order_id": 3,
+                                "payment_method": "Credit Card",
+                                "total_amount": 100
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Payment successful",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Payment processed successfully"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "x-readme": {
+        "explorer-enabled": true,
+        "proxy-enabled": true,
+        "samples-enabled": true
+    }
+}
