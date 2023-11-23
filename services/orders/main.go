@@ -13,8 +13,8 @@ import (
 func setupRouter() *gin.Engine {
 	router := gin.Default()
 
-	exampleRouterGroup := router.Group("/example")
-	routes.AddExampleRoutes(exampleRouterGroup)
+	ordersRouterGroup := router.Group("/orders")
+	routes.AddOrdersRoutes(ordersRouterGroup)
 
 	return router
 }
