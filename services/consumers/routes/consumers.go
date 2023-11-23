@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"cosn/template/database"
-	"cosn/template/model"
+	"cosn/consumers/database"
+	"cosn/consumers/model"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -113,7 +113,7 @@ func deleteConsumerById(c *gin.Context) {
 	c.JSON(http.StatusOK, consumerModel)
 }
 
-func AddExampleRoutes(routerGroup *gin.RouterGroup) {
+func AddConsumersRoutes(routerGroup *gin.RouterGroup) {
 	routerGroup.POST("/", createConsumer)
 	routerGroup.GET("/", getAllConsumers)
 	routerGroup.GET(":id", getConsumerById)
