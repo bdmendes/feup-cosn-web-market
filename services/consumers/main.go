@@ -1,8 +1,8 @@
 package main
 
 import (
-	"cosn/template/database"
-	"cosn/template/routes"
+	"cosn/consumers/database"
+	"cosn/consumers/routes"
 	"fmt"
 	"os"
 
@@ -13,8 +13,17 @@ import (
 func setupRouter() *gin.Engine {
 	router := gin.Default()
 
-	exampleRouterGroup := router.Group("/example")
-	routes.AddExampleRoutes(exampleRouterGroup)
+	consumerRouterGroup := router.Group("/")
+	routes.AddConsumersRoutes(consumerRouterGroup)
+
+	notificationRouterGroup := router.Group("/notifications")
+	routes.AddNotificationRoutes(notificationRouterGroup)
+
+	recommendationRouterGroup := router.Group("/recommendations")
+	routes.AddRecommendationRoutes(recommendationRouterGroup)
+
+	shoppingBasketRouterGroup := router.Group("/basket")
+	routes.AddShoppingBasketRoutes(shoppingBasketRouterGroup)
 
 	return router
 }
