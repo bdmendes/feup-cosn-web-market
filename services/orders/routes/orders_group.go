@@ -113,25 +113,33 @@ func updateOrder(c *gin.Context) {
 		return
 	}
 
-	var order model.Order
-	if err := c.BindJSON(&order); err != nil {
+	var updateOrderRequest model.UpdateOrderRequest
+	if err := c.BindJSON(&updateOrderRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
 	ordersCollection := database.GetDatabase().Collection("orders")
 
-	if err := model.IsOrderValid(order); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	updateSet := bson.M{}
+
+	if updateOrderRequest.Location != nil {
+		updateSet["location"] = *(updateOrderRequest.Location)
 	}
 
-	update := bson.M{
-		"$set": bson.M{
-			"status":        order.Status,
-			"interval_days": order.IntervalDays,
-		},
+	if updateOrderRequest.Payment != nil {
+		updateSet["payment"] = *(updateOrderRequest.Payment)
 	}
+
+	if updateOrderRequest.Status != nil {
+		updateSet["status"] = *(updateOrderRequest.Status)
+	}
+
+	if updateOrderRequest.IntervalDays != nil {
+		updateSet["intervaldays"] = *(updateOrderRequest.IntervalDays)
+	}
+
+	update := bson.M{"$set": updateSet}
 
 	doc := ordersCollection.FindOneAndUpdate(c, bson.M{"_id": order_id}, update)
 	if doc.Err() != nil {

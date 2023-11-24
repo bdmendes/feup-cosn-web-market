@@ -37,6 +37,13 @@ type NewOrderRequest struct {
 	IntervalDays *int               `json:"interval_days"`
 }
 
+type UpdateOrderRequest struct {
+	Location     *string `json:"location"`
+	Payment      *string `json:"payment"`
+	Status       *string `json:"status"`
+	IntervalDays *int    `json:"interval_days"`
+}
+
 func IsOrderValid(order Order) error {
 	if order.IntervalDays < 0 {
 		return errors.New("invalid interval")
