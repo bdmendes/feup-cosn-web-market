@@ -22,7 +22,7 @@ type Order struct {
 	Products     []ProductQuantity  `json:"products"`
 	TotalPrice   float64            `json:"total_price"`
 	Date         *time.Time         `json:"date"`
-	IntervalDays *int64             `json:"interval_days"`
+	IntervalDays *int               `json:"interval_days"`
 	Payment      string             `json:"payment"`
 	Status       *string            `json:"status"`
 }

@@ -34,16 +34,16 @@ func getOrders(c *gin.Context) {
 	ordersCollection := database.GetDatabase().Collection("orders")
 
 	cursor, err := ordersCollection.Find(c, bson.M{})
-
 	if err != nil {
-		panic("Failed to get example models: " + err.Error())
+		c.JSON(http.StatusNotFound, err.Error())
+		return
 	}
 
 	var orders []model.Order
 	err = cursor.All(c, &orders)
-
 	if err != nil {
-		panic("Failed to get example models: " + err.Error())
+		c.JSON(http.StatusNotFound, err.Error())
+		return
 	}
 
 	if len(orders) == 0 {
@@ -60,8 +60,6 @@ func getClientOrders(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
 		return
 	}
-
-	println(client_id.Hex())
 
 	ordersCollection := database.GetDatabase().Collection("orders")
 	cursor, err := ordersCollection.Find(c, bson.M{"client": client_id})
