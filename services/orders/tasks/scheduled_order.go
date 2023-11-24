@@ -14,33 +14,33 @@ func ScheduledOrdersTask() {
 	ordersCollection := database.GetDatabase().Collection("orders")
 
 	for {
-		time.Sleep(1 * time.Second)
+		// For production:
+		// time.Sleep(12 * time.Hour)
+
+		// For testing:
+		time.Sleep(15 * time.Second)
 
 		cursor, err := ordersCollection.Find(context.Background(), bson.M{"intervaldays": bson.M{"$gt": 0}})
 		if err != nil {
+			println("Order Task: " + err.Error())
 			continue
 		}
 
 		var orders []model.Order
 		err = cursor.All(context.Background(), &orders)
 		if err != nil {
+			println("Order Task: " + err.Error())
 			continue
 		}
 
 		for _, order := range orders {
-			if time.Now().After(order.Date.AddDate(0, 0, *order.IntervalDays)) {
+			if time.Now().After(order.Date.AddDate(0, 0, order.IntervalDays)) {
 				new_order := order
-
 				new_order.ID = primitive.NewObjectID()
+				new_order.Status = model.PENDING
+				new_order.Date = time.Now()
 
-				new_status := model.PENDING
-				new_order.Status = &new_status
-
-				new_date := time.Now()
-				new_order.Date = &(new_date)
-
-				zero := 0
-				order.IntervalDays = &zero
+				order.IntervalDays = 0
 				update := bson.M{
 					"$set": bson.M{
 						"intervaldays": order.IntervalDays,
@@ -49,10 +49,12 @@ func ScheduledOrdersTask() {
 
 				doc := ordersCollection.FindOneAndUpdate(context.Background(), bson.M{"_id": order.ID}, update)
 				if doc.Err() != nil {
+					println("Order Task: " + doc.Err().Error())
 					break
 				}
 
 				if _, err := ordersCollection.InsertOne(context.Background(), new_order); err != nil {
+					println("Order Task: " + err.Error())
 					break
 				}
 			}

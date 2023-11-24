@@ -17,18 +17,28 @@ const (
 type Order struct {
 	ID           primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
 	Client       primitive.ObjectID `json:"client_id"`
+	Description  string             `json:"description"`
+	Location     string             `json:"location"`
+	Products     []ProductQuantity  `json:"products"`
+	TotalPrice   float64            `json:"total_price"`
+	Date         time.Time          `json:"date"`
+	IntervalDays int                `json:"interval_days"`
+	Payment      string             `json:"payment"`
+	Status       string             `json:"status"`
+}
+
+type NewOrderRequest struct {
+	Client       primitive.ObjectID `json:"client_id"`
 	Description  *string            `json:"description"`
 	Location     string             `json:"location"`
 	Products     []ProductQuantity  `json:"products"`
 	TotalPrice   float64            `json:"total_price"`
-	Date         *time.Time         `json:"date"`
-	IntervalDays *int               `json:"interval_days"`
 	Payment      string             `json:"payment"`
-	Status       *string            `json:"status"`
+	IntervalDays *int               `json:"interval_days"`
 }
 
 func IsOrderValid(order Order) error {
-	if order.IntervalDays != nil && *(order.IntervalDays) < 1 {
+	if order.IntervalDays < 0 {
 		return errors.New("invalid interval")
 	}
 
@@ -40,8 +50,8 @@ func IsOrderValid(order Order) error {
 		return errors.New("order with no products")
 	}
 
-	if *(order.Status) != PENDING && *(order.Status) != AUTHORIZED &&
-		*(order.Status) != DELIVERED && *(order.Status) != CANCELLED {
+	if order.Status != PENDING && order.Status != AUTHORIZED &&
+		order.Status != DELIVERED && order.Status != CANCELLED {
 		return errors.New("invalid order status")
 	}
 
@@ -52,4 +62,26 @@ func IsOrderValid(order Order) error {
 	}
 
 	return nil
+}
+
+func CreateOrderFromRequest(orderRequest NewOrderRequest) Order {
+	if orderRequest.IntervalDays == nil {
+		*(orderRequest.IntervalDays) = 0
+	}
+
+	if orderRequest.Description == nil {
+		*(orderRequest.Description) = ""
+	}
+
+	return Order{
+		Client:       orderRequest.Client,
+		Description:  *(orderRequest.Description),
+		Location:     orderRequest.Location,
+		Products:     orderRequest.Products,
+		TotalPrice:   orderRequest.TotalPrice,
+		Payment:      orderRequest.Payment,
+		IntervalDays: *(orderRequest.IntervalDays),
+		Date:         time.Now(),
+		Status:       PENDING,
+	}
 }

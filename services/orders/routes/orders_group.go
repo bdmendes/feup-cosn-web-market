@@ -4,7 +4,6 @@ import (
 	"cosn/orders/database"
 	"cosn/orders/model"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -64,36 +63,37 @@ func getClientOrders(c *gin.Context) {
 	ordersCollection := database.GetDatabase().Collection("orders")
 	cursor, err := ordersCollection.Find(c, bson.M{"client": client_id})
 	if err != nil {
-		panic("Failed to get example models: " + err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	var orders []model.Order
-	err = cursor.All(c, &orders)
-	if err != nil {
-		panic("Failed to get example models: " + err.Error())
+	if err = cursor.All(c, &orders); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if len(orders) == 0 {
+		c.JSON(http.StatusNoContent, gin.H{})
+		return
 	}
 
 	c.JSON(http.StatusOK, orders)
 }
 
 func createOrder(c *gin.Context) {
-	var order model.Order
-
-	if err := c.BindJSON(&order); err != nil {
+	var orderRequest model.NewOrderRequest
+	if err := c.BindJSON(&orderRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	status := model.PENDING
-	order.Status = &status
+	order := model.CreateOrderFromRequest(orderRequest)
 
 	if err := model.IsOrderValid(order); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	now := time.Now()
-	order.Date = &(now)
 
 	ordersCollection := database.GetDatabase().Collection("orders")
 
@@ -103,6 +103,7 @@ func createOrder(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{})
+	//TODO: communicate with payment to authorize the purchase
 }
 
 func updateOrder(c *gin.Context) {
@@ -128,7 +129,6 @@ func updateOrder(c *gin.Context) {
 	update := bson.M{
 		"$set": bson.M{
 			"status":        order.Status,
-			"date":          order.Date,
 			"interval_days": order.IntervalDays,
 		},
 	}
@@ -140,6 +140,7 @@ func updateOrder(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{})
+	//TODO: when authorized communicate with delivery service start delivery process
 }
 
 func AddOrdersRoutes(routerGroup *gin.RouterGroup) {
