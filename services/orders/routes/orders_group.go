@@ -1,14 +1,41 @@
 package routes
 
 import (
+	"bytes"
 	"cosn/orders/database"
 	"cosn/orders/model"
+	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/joho/godotenv/autoload"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+func sendPostRequest(payload []byte, url string, callback func(*http.Response)) {
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
+	if err != nil {
+		fmt.Println("Error creating request:", err)
+		return
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error making request:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	fmt.Println("Response Status:", resp.Status)
+
+	callback(resp)
+}
 
 func getOrder(c *gin.Context) {
 	order_id, err := primitive.ObjectIDFromHex(c.Param("id"))
@@ -81,6 +108,11 @@ func getClientOrders(c *gin.Context) {
 	c.JSON(http.StatusOK, orders)
 }
 
+func paymentCallback(resp *http.Response) {
+	fmt.Println("Payment callback")
+	//TODO: update order status to authorized
+}
+
 func createOrder(c *gin.Context) {
 	var orderRequest model.NewOrderRequest
 	if err := c.BindJSON(&orderRequest); err != nil {
@@ -103,7 +135,14 @@ func createOrder(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{})
-	//TODO: communicate with payment to authorize the purchase
+
+	payload := []byte(`{"amount": ` + strconv.FormatFloat(order.TotalPrice, 'f', -1, 64) + `, "payment_method": "paypal", "payment_data": "` + order.Payment + `"}`)
+	go sendPostRequest(payload, os.Getenv("PAYMENT_SERVICE_URL")+"/payment", paymentCallback)
+}
+
+func deliveryCallback(resp *http.Response) {
+	fmt.Println("Delivery callback")
+	//TODO: update order status to authorized
 }
 
 func updateOrder(c *gin.Context) {
@@ -149,6 +188,9 @@ func updateOrder(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{})
 	//TODO: when authorized communicate with delivery service start delivery process
+
+	payload := []byte(`{}`)
+	go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL")+"/delivery", deliveryCallback)
 }
 
 func AddOrdersRoutes(routerGroup *gin.RouterGroup) {
