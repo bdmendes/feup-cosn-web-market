@@ -16,6 +16,11 @@ func payOrder(c *gin.Context) {
 		return
 	}
 
+	if model.IsPaymentMethodValid(paymentRequestData.PaymentMethod) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "payment method not valid"})
+		return
+	}
+
 	// Currently, the service does not work with real data.
 	// It fails 20% of the time.
 	r, err := rand.Int(rand.Reader, big.NewInt(100))
