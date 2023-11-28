@@ -31,24 +31,10 @@ func getDeliveryData(c *gin.Context) {
 func createDelivery(c *gin.Context) {
 	deliveryCollection := database.GetDatabase().Collection("delivery")
 
-	orderId := c.Param("orderId")
-
-	if orderId == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing orderId"})
-		return
-	}
-
-	orderIdInt, err := strconv.ParseInt(orderId, 10, 64)
-
+	var deliveryRequestData model.DeliveryReqyestData
+	err := c.BindJSON(&deliveryRequestData)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid orderId"})
-		return
-	}
-
-	isExpressDelivery := c.Query("express") != ""
-
-	if orderId == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing orderId"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
 
@@ -57,14 +43,15 @@ func createDelivery(c *gin.Context) {
 	// Random delivery time between 10 minutes and 3 hours for all deliveries
 	deliveryDateTime := currentDateTime.Add(time.Duration(float64(10+rand.Intn(170)) * time.Duration.Minutes(1)))
 
-	if !isExpressDelivery {
+	if !deliveryRequestData.ExpressDelivery {
 		// Add between 1 and 3 days for non-express deliveries
 		deliveryDateTime = deliveryDateTime.Add(time.Duration(float64(1+rand.Intn(3)) * time.Duration.Hours(24)))
 	}
 
 	var delivery model.Delivery
-	delivery.OrderID = orderIdInt
+	delivery.OrderID = deliveryRequestData.OrderID
 	delivery.EstimatedDeliveryDateTime = deliveryDateTime.Format(time.RFC3339)
+	delivery.Location = deliveryRequestData.Location
 
 	_, err = deliveryCollection.InsertOne(context.Background(), delivery)
 
