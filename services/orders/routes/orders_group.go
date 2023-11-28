@@ -2,6 +2,7 @@ package routes
 
 import (
 	"bytes"
+	"context"
 	"cosn/orders/database"
 	"cosn/orders/model"
 	"fmt"
@@ -15,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func sendPostRequest(payload []byte, url string, callback func(*http.Response)) {
+func sendPostRequest(payload []byte, url string, callback func(*http.Response, map[string]interface{}), data map[string]interface{}) {
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 	if err != nil {
 		fmt.Println("Error creating request:", err)
@@ -34,7 +35,7 @@ func sendPostRequest(payload []byte, url string, callback func(*http.Response)) 
 
 	fmt.Println("Response Status:", resp.Status)
 
-	callback(resp)
+	callback(resp, data)
 }
 
 func getOrder(c *gin.Context) {
@@ -108,12 +109,31 @@ func getClientOrders(c *gin.Context) {
 	c.JSON(http.StatusOK, orders)
 }
 
-func paymentCallback(resp *http.Response) {
-	fmt.Println("Payment callback")
-	//TODO: update order status to authorized
+func paymentCallback(resp *http.Response, data map[string]interface{}) {
+	if resp.StatusCode == http.StatusOK {
+		order_id, err := primitive.ObjectIDFromHex(data["order_id"].(string))
+		if err != nil {
+			fmt.Println("Error: invalid order_id")
+			return
+		}
+
+		ordersCollection := database.GetDatabase().Collection("orders")
+
+		update := bson.M{"$set": bson.M{"status": model.AUTHORIZED}}
+
+		doc := ordersCollection.FindOneAndUpdate(context.Background(), bson.M{"_id": order_id}, update)
+		if doc.Err() != nil {
+			fmt.Println("Error: ", doc.Err())
+			return
+		}
+
+		// go sendPostRequest([]byte(`{}`), os.Getenv("DELIVERY_SERVICE_URL")+"/delivery", deliveryCallback, data)
+	} else {
+		fmt.Println("Payment failed: ", resp.Status)
+	}
 }
 
-func deliveryCallback(resp *http.Response) {
+func deliveryCallback(resp *http.Response, data map[string]interface{}) {
 	fmt.Println("Delivery callback")
 	//TODO: update order status to authorized
 }
@@ -134,18 +154,21 @@ func createOrder(c *gin.Context) {
 
 	ordersCollection := database.GetDatabase().Collection("orders")
 
-	if _, err := ordersCollection.InsertOne(c, order); err != nil {
+	doc, err := ordersCollection.InsertOne(c, order)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{})
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{})
 
+	order.ID = doc.InsertedID.(primitive.ObjectID)
+
 	payload := []byte(`{"amount": ` + strconv.FormatFloat(order.PaymentData.Amount, 'f', -1, 64) +
 		`, "payment_method": "` + order.PaymentData.PaymentMethod +
 		`", "payment_data": "` + order.PaymentData.PaymentData +
 		`"}`)
-	go sendPostRequest(payload, os.Getenv("PAYMENT_SERVICE_URL")+"/payment", paymentCallback)
+	go sendPostRequest(payload, os.Getenv("PAYMENT_SERVICE_URL")+"/payment", paymentCallback, map[string]interface{}{"order_id": order.ID.Hex()})
 }
 
 func updateOrder(c *gin.Context) {
@@ -193,7 +216,7 @@ func updateOrder(c *gin.Context) {
 	//TODO: when authorized communicate with delivery service start delivery process
 
 	payload := []byte(`{}`)
-	go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL")+"/delivery", deliveryCallback)
+	go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL")+"/delivery", deliveryCallback, map[string]interface{}{"order_id": order_id.Hex()})
 }
 
 func AddOrdersRoutes(routerGroup *gin.RouterGroup) {
