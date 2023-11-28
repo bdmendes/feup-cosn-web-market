@@ -20,28 +20,26 @@ type Order struct {
 	Description  string             `json:"description"`
 	Location     string             `json:"location"`
 	Products     []ProductQuantity  `json:"products"`
-	TotalPrice   float64            `json:"total_price"`
 	Date         time.Time          `json:"date"`
 	IntervalDays int                `json:"interval_days"`
-	Payment      string             `json:"payment"`
+	PaymentData  PaymentData        `json:"payment"`
 	Status       string             `json:"status"`
 }
 
 type NewOrderRequest struct {
-	Client       primitive.ObjectID `json:"client_id"`
+	Client       primitive.ObjectID `json:"client_id" binding:"required"`
 	Description  *string            `json:"description"`
-	Location     string             `json:"location"`
-	Products     []ProductQuantity  `json:"products"`
-	TotalPrice   float64            `json:"total_price"`
-	Payment      string             `json:"payment"`
+	Location     string             `json:"location" binding:"required"`
+	Products     []ProductQuantity  `json:"products" binding:"required"`
+	PaymentData  PaymentData        `json:"payment" binding:"required"`
 	IntervalDays *int               `json:"interval_days"`
 }
 
 type UpdateOrderRequest struct {
-	Location     *string `json:"location"`
-	Payment      *string `json:"payment"`
-	Status       *string `json:"status"`
-	IntervalDays *int    `json:"interval_days"`
+	Location     *string      `json:"location"`
+	PaymentData  *PaymentData `json:"payment"`
+	Status       *string      `json:"status"`
+	IntervalDays *int         `json:"interval_days"`
 }
 
 func IsOrderValid(order Order) error {
@@ -49,7 +47,7 @@ func IsOrderValid(order Order) error {
 		return errors.New("invalid interval")
 	}
 
-	if order.TotalPrice < 0 {
+	if order.PaymentData.Amount < 0 {
 		return errors.New("invalid price")
 	}
 
@@ -85,8 +83,7 @@ func CreateOrderFromRequest(orderRequest NewOrderRequest) Order {
 		Description:  *(orderRequest.Description),
 		Location:     orderRequest.Location,
 		Products:     orderRequest.Products,
-		TotalPrice:   orderRequest.TotalPrice,
-		Payment:      orderRequest.Payment,
+		PaymentData:  orderRequest.PaymentData,
 		IntervalDays: *(orderRequest.IntervalDays),
 		Date:         time.Now(),
 		Status:       PENDING,

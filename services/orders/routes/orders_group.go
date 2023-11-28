@@ -113,6 +113,11 @@ func paymentCallback(resp *http.Response) {
 	//TODO: update order status to authorized
 }
 
+func deliveryCallback(resp *http.Response) {
+	fmt.Println("Delivery callback")
+	//TODO: update order status to authorized
+}
+
 func createOrder(c *gin.Context) {
 	var orderRequest model.NewOrderRequest
 	if err := c.BindJSON(&orderRequest); err != nil {
@@ -136,13 +141,11 @@ func createOrder(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{})
 
-	payload := []byte(`{"amount": ` + strconv.FormatFloat(order.TotalPrice, 'f', -1, 64) + `, "payment_method": "paypal", "payment_data": "` + order.Payment + `"}`)
+	payload := []byte(`{"amount": ` + strconv.FormatFloat(order.PaymentData.Amount, 'f', -1, 64) +
+		`, "payment_method": "` + order.PaymentData.PaymentMethod +
+		`", "payment_data": "` + order.PaymentData.PaymentData +
+		`"}`)
 	go sendPostRequest(payload, os.Getenv("PAYMENT_SERVICE_URL")+"/payment", paymentCallback)
-}
-
-func deliveryCallback(resp *http.Response) {
-	fmt.Println("Delivery callback")
-	//TODO: update order status to authorized
 }
 
 func updateOrder(c *gin.Context) {
@@ -166,8 +169,8 @@ func updateOrder(c *gin.Context) {
 		updateSet["location"] = *(updateOrderRequest.Location)
 	}
 
-	if updateOrderRequest.Payment != nil {
-		updateSet["payment"] = *(updateOrderRequest.Payment)
+	if updateOrderRequest.PaymentData != nil {
+		updateSet["payment"] = *(updateOrderRequest.PaymentData)
 	}
 
 	if updateOrderRequest.Status != nil {
