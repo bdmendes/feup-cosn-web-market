@@ -127,15 +127,44 @@ func paymentCallback(resp *http.Response, data map[string]interface{}) {
 			return
 		}
 
-		// go sendPostRequest([]byte(`{}`), os.Getenv("DELIVERY_SERVICE_URL")+"/delivery", deliveryCallback, data)
+		var order model.Order
+		err = doc.Decode(&order)
+		if err != nil {
+			fmt.Println("Error: ", err)
+			return
+		}
+
+		payload := []byte(`{"order_id": "` + order_id.Hex() +
+			`", "location": "` + order.Location +
+			`", "express_delivery": ` + strconv.FormatBool(order.ExpressDelivery) +
+			`}`)
+
+		go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL")+"/delivery", deliveryCallback, data)
 	} else {
 		fmt.Println("Payment failed: ", resp.Status)
 	}
 }
 
 func deliveryCallback(resp *http.Response, data map[string]interface{}) {
-	fmt.Println("Delivery callback")
-	//TODO: update order status to authorized
+	if resp.StatusCode == http.StatusOK {
+		order_id, err := primitive.ObjectIDFromHex(data["order_id"].(string))
+		if err != nil {
+			fmt.Println("Error: invalid order_id")
+			return
+		}
+
+		ordersCollection := database.GetDatabase().Collection("orders")
+
+		update := bson.M{"$set": bson.M{"status": model.SHIPPED}}
+
+		doc := ordersCollection.FindOneAndUpdate(context.Background(), bson.M{"_id": order_id}, update)
+		if doc.Err() != nil {
+			fmt.Println("Error: ", doc.Err())
+			return
+		}
+	} else {
+		fmt.Println("Delivery failed: ", resp.Status)
+	}
 }
 
 func createOrder(c *gin.Context) {
@@ -213,10 +242,10 @@ func updateOrder(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{})
-	//TODO: when authorized communicate with delivery service start delivery process
+	// TODO: when authorized communicate with delivery service start delivery process
 
-	payload := []byte(`{}`)
-	go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL")+"/delivery", deliveryCallback, map[string]interface{}{"order_id": order_id.Hex()})
+	// payload := []byte(`{}`)
+	// go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL")+"/delivery", deliveryCallback, map[string]interface{}{"order_id": order_id.Hex()})
 }
 
 func AddOrdersRoutes(routerGroup *gin.RouterGroup) {

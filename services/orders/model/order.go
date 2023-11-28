@@ -10,29 +10,32 @@ import (
 const (
 	PENDING    = "PENDING"
 	AUTHORIZED = "AUTHORIZED"
+	SHIPPED    = "SHIPPED"
 	DELIVERED  = "DELIVERED"
 	CANCELLED  = "CANCELLED"
 )
 
 type Order struct {
-	ID           primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
-	Client       primitive.ObjectID `json:"client_id"`
-	Description  string             `json:"description"`
-	Location     string             `json:"location"`
-	Products     []ProductQuantity  `json:"products"`
-	Date         time.Time          `json:"date"`
-	IntervalDays int                `json:"interval_days"`
-	PaymentData  PaymentData        `json:"payment"`
-	Status       string             `json:"status"`
+	ID              primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	Client          primitive.ObjectID `json:"client_id"`
+	Description     string             `json:"description"`
+	Location        string             `json:"location"`
+	Products        []ProductQuantity  `json:"products"`
+	Date            time.Time          `json:"date"`
+	IntervalDays    int                `json:"interval_days"`
+	ExpressDelivery bool               `json:"express_delivery"`
+	PaymentData     PaymentData        `json:"payment"`
+	Status          string             `json:"status"`
 }
 
 type NewOrderRequest struct {
-	Client       primitive.ObjectID `json:"client_id" binding:"required"`
-	Description  *string            `json:"description"`
-	Location     string             `json:"location" binding:"required"`
-	Products     []ProductQuantity  `json:"products" binding:"required"`
-	PaymentData  PaymentData        `json:"payment" binding:"required"`
-	IntervalDays *int               `json:"interval_days"`
+	Client          primitive.ObjectID `json:"client_id" binding:"required"`
+	Description     *string            `json:"description"`
+	Location        string             `json:"location" binding:"required"`
+	Products        []ProductQuantity  `json:"products" binding:"required"`
+	PaymentData     PaymentData        `json:"payment" binding:"required"`
+	IntervalDays    *int               `json:"interval_days"`
+	ExpressDelivery bool               `json:"express_delivery"`
 }
 
 type UpdateOrderRequest struct {
