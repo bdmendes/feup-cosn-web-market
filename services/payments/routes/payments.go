@@ -16,7 +16,7 @@ func payOrder(c *gin.Context) {
 		return
 	}
 
-	if model.IsPaymentMethodValid(paymentRequestData.PaymentMethod) {
+	if !model.IsPaymentMethodValid(paymentRequestData.PaymentMethod) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "payment method not valid"})
 		return
 	}
