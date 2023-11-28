@@ -241,11 +241,24 @@ func updateOrder(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{})
-	// TODO: when authorized communicate with delivery service start delivery process
+	order := model.Order{}
+	doc.Decode(&order)
 
-	// payload := []byte(`{}`)
-	// go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL")+"/delivery", deliveryCallback, map[string]interface{}{"order_id": order_id.Hex()})
+	c.JSON(http.StatusOK, gin.H{})
+
+	if order.Status == model.PENDING && updateOrderRequest.PaymentData != nil {
+		payload := []byte(`{"amount": ` + strconv.FormatFloat(order.PaymentData.Amount, 'f', -1, 64) +
+			`, "payment_method": "` + order.PaymentData.PaymentMethod +
+			`", "payment_data": "` + order.PaymentData.PaymentData +
+			`"}`)
+		go sendPostRequest(payload, os.Getenv("PAYMENT_SERVICE_URL")+"/payment", paymentCallback, map[string]interface{}{"order_id": order_id.Hex()})
+	} else if order.Status == model.AUTHORIZED && updateOrderRequest.Status != nil && *(updateOrderRequest.Status) == model.SHIPPED {
+		payload := []byte(`{"order_id": "` + order_id.Hex() +
+			`", "location": "` + order.Location +
+			`", "express_delivery": ` + strconv.FormatBool(order.ExpressDelivery) +
+			`}`)
+		go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL")+"/delivery", deliveryCallback, map[string]interface{}{"order_id": order_id.Hex()})
+	}
 }
 
 func AddOrdersRoutes(routerGroup *gin.RouterGroup) {
