@@ -25,13 +25,13 @@ func getDeliveryData(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, delivery)
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func createDelivery(c *gin.Context) {
 	deliveryCollection := database.GetDatabase().Collection("delivery")
 
-	var deliveryRequestData model.DeliveryReqyestData
+	var deliveryRequestData model.DeliveryRequestData
 	err := c.BindJSON(&deliveryRequestData)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
@@ -59,7 +59,7 @@ func createDelivery(c *gin.Context) {
 		panic(err)
 	}
 
-	c.JSON(http.StatusOK, delivery)
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func markDeliveryAsDone(c *gin.Context) {
@@ -99,7 +99,7 @@ func markDeliveryAsDone(c *gin.Context) {
 		panic(err)
 	}
 
-	c.JSON(http.StatusOK, delivery)
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func AddDeliveryRoutes(rg *gin.RouterGroup) {
