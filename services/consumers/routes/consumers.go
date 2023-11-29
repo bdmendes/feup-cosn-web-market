@@ -59,7 +59,11 @@ func getAllConsumers(c *gin.Context) {
 func getConsumerById(c *gin.Context) {
 	consumerCollection := database.GetDatabase().Collection("consumers")
 
-	id := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	var consumerModel model.Consumer
 	if err := consumerCollection.FindOne(c, bson.M{"_id": id}).Decode(&consumerModel); err != nil {
