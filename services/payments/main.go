@@ -1,9 +1,8 @@
 package main
 
 import (
-	"cosn/orders/database"
-	"cosn/orders/routes"
-	"cosn/orders/tasks"
+	"cosn/payments/database"
+	"cosn/payments/routes"
 	"fmt"
 	"os"
 
@@ -14,8 +13,8 @@ import (
 func setupRouter() *gin.Engine {
 	router := gin.Default()
 
-	ordersRouterGroup := router.Group("/orders")
-	routes.AddOrdersRoutes(ordersRouterGroup)
+	exampleRouterGroup := router.Group("/payment")
+	routes.AddPaymentRoutes(exampleRouterGroup)
 
 	return router
 }
@@ -31,8 +30,7 @@ func main() {
 		fmt.Printf("Using default port %s\n", port)
 	}
 
-	go tasks.ScheduledOrdersTask()
-
 	router := setupRouter()
+
 	router.Run(":" + port)
 }
