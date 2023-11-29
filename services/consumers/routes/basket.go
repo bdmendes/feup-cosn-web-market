@@ -7,10 +7,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func getShoppingCart(c *gin.Context) {
-	consumerId := c.Param("id")
+	consumerId, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	consumerCollection := database.GetDatabase().Collection("consumers")
 
@@ -19,11 +24,20 @@ func getShoppingCart(c *gin.Context) {
 		panic("Failed to get consumer: " + err.Error())
 	}
 
+	if len(consumer.ShoppingCart) == 0 {
+		c.JSON(http.StatusNoContent, gin.H{})
+		return
+	}
+
 	c.JSON(http.StatusOK, consumer.ShoppingCart)
 }
 
 func updateShoppingCart(c *gin.Context) {
-	consumerId := c.Param("id")
+	consumerId, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	consumerCollection := database.GetDatabase().Collection("consumers")
 
@@ -49,7 +63,11 @@ func updateShoppingCart(c *gin.Context) {
 }
 
 func removeFromShoppingCart(c *gin.Context) {
-	consumerId := c.Param("id")
+	consumerId, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	consumerCollection := database.GetDatabase().Collection("consumers")
 
