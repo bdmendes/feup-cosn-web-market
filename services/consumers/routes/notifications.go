@@ -63,7 +63,7 @@ func registerForPriceNotification(c *gin.Context) {
 		panic("Failed to update consumer: " + err.Error())
 	}
 
-	c.JSON(http.StatusOK, gin.H{})
+	c.Status(http.StatusOK)
 }
 
 func AddNotificationRoutes(routerGroup *gin.RouterGroup) {
