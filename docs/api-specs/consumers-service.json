@@ -1,371 +1,533 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-        "title": "Consumers service",
-        "version": "1.0.0"
-    },
-    "paths": {
-        "/api/consumers": {
-            "post": {
-                "summary": "Create a new Consumer",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "example": {
-                                "name": "John Doe",
-                                "email": "johndoe@example.com"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Consumer created successfully",
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "consumer_id": 4
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/consumers/{id}": {
-            "get": {
-                "summary": "Get consumer information",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "consumer_id": 4,
-                                    "name": "John Doe",
-                                    "email": "johndoe@example.com"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "put": {
-                "summary": "Update consumer information",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "example": {
-                                "name": "Updated Name"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Consumer information updated successfully",
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "message": "Consumer information updated"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "summary": "Delete consumer information",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Consumer information deleted successfully"
-                    }
-                }
-            }
-        },
-        "/api/consumers/{id}/shopping-cart": {
-            "get": {
-                "summary": "Get shopping cart of a consumer",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "shopping_cart": [
-                                        {
-                                            "product_id": 456,
-                                            "name": "Product A",
-                                            "quantity": 2
-                                        },
-                                        {
-                                            "product_id": 789,
-                                            "name": "Product B",
-                                            "quantity": 1
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "put": {
-                "summary": "Update consumer's shopping cart",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "example": {
-                                "shopping_cart": [
-                                    {
-                                        "product_id": 456,
-                                        "quantity": 3
-                                    },
-                                    {
-                                        "product_id": 789,
-                                        "quantity": 2
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Shopping cart updated successfully",
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "message": "Shopping cart updated"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "summary": "Clear shopping cart",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Shopping cart cleared successfully"
-                    }
-                }
-            }
-        },
-        "/api/notifications/clients/{id}": {
-            "post": {
-                "summary": "Register for price drop notifications on a given product",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "example": {
-                                "product_id": 456,
-                                "threshold_price": 50
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Notification registration successful",
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "message": "Notification registered"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "get": {
-                "summary": "Get registered price drop notifications",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "notifications": [
-                                        {
-                                            "product_id": 456,
-                                            "threshold_price": 50
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/recomendations/clients/{users}": {
-            "get": {
-                "summary": "Get recommended products",
-                "parameters": [
-                    {
-                        "name": "users",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "category",
-                        "in": "query",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "recommendations": [
-                                        {
-                                            "product_id": 123,
-                                            "name": "Recommended Product 1"
-                                        },
-                                        {
-                                            "product_id": 789,
-                                            "name": "Recommended Product 2"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/recomendation/clients/{id}": {
-            "get": {
-                "summary": "Get recommended shopping-cart",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "shopping_cart": [
-                                        {
-                                            "product_id": 123,
-                                            "name": "Recommended Product 1"
-                                        },
-                                        {
-                                            "product_id": 789,
-                                            "name": "Recommended Product 2"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "x-readme": {
-        "explorer-enabled": true,
-        "proxy-enabled": true,
-        "samples-enabled": true
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Consumer Service",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8000"
     }
+  ],
+  "components": {
+    "schemas": {
+      "ProductQuantity": {
+        "type": "object",
+        "properties": {
+          "Product": {
+            "type": "string",
+            "example": "65668e55a3f8dfb5ef137c86"
+          },
+          "Quantity": {
+            "type": "number",
+            "example": 1
+          }
+        }
+      },
+      "Product":{
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "65668e55a3f8dfb5ef137c86"
+          },
+          "Description": {
+            "type": "string",
+            "example": "Banana"
+          },
+          "Category": {
+            "type": "string",
+            "example": "Fruits"
+          },
+          "Prices": {
+            "type": "number",
+            "example": 10.2
+          }
+        }
+      },
+      "Consumer": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "65667d05875bd64d2dbdd3c7"
+          },
+          "Name": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "Location": {
+            "type": "string",
+            "example": "Rua Dr. Roberto Frias, s/n, 4200-465 Porto, Portugal"
+          },
+          "WatchedProducts": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "65668e55a3f8dfb5ef137c86"
+            }
+          },
+          "ShoppingCart": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductQuantity"
+            }
+          },
+          "OrderHistory": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductQuantity"
+            }
+          }
+        }
+      },
+      "PriceDropNotification": {
+        "type": "object",
+        "properties": {
+          "consumerId": {
+            "type": "string",
+            "example": "65668e55a3f8dfb5ef137c86"
+          },
+          "productId": {
+            "type": "string",
+            "example": "65668e55a3f8dfb5ef137c86"
+          },
+          "oldPrice": {
+            "type": "number",
+            "example": 12.0
+          },
+          "newPrice": {
+            "type": "number",
+            "example": 10.2
+          }
+        }
+      }
+    },
+    "parameters": {
+      "consumerId": {
+        "name": "consumerId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "65667d05875bd64d2dbdd3c7"
+        },
+        "description": "Consumer id"
+      }
+    },
+    "requestBodies": {
+      "Consumer": {
+        "description": "New consumer information",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "Name": {
+                  "type": "string",
+                  "example": "John Doe"
+                },
+                "Location": {
+                  "type": "string",
+                  "example": "Rua Dr. Roberto Frias, s/n, 4200-465 Porto, Portugal"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/notifications/{consumerId}": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Get all notifications for consumer",
+        "description": "Get all notifications for consumer",
+        "operationId": "getAllNotificationsForConsumer",
+        "responses": {
+          "200": {
+            "description": "List of price notifications for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PriceDropNotification"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/consumerId"
+        }
+      ]
+    },
+    "/notifications/{consumerId}/products/{productId}": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Register for price notification",
+        "description": "Register for price notification",
+        "operationId": "registerForPriceNotification",
+        "responses": {
+          "200": {
+            "description": "Registered for price notification"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/consumerId"
+        },
+        {
+          "name": "productId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": "65668e55a3f8dfb5ef137c86"
+          },
+          "description": "Product id"
+        }
+      ]
+    },
+    "/recommendations/{consumerId}/recommendations/category/{category}": {
+      "get": {
+        "tags": [
+          "Recommendations"
+        ],
+        "summary": "Get category recommendations",
+        "description": "Get category recommendations",
+        "operationId": "getCategoryRecommendations",
+        "parameters": [
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2"
+            },
+            "description": "Number recommended products"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of recommended products",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/consumerId"
+        },
+        {
+          "name": "category",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": "Fruits"
+          },
+          "description": "Product category"
+        }
+      ]
+    },
+    "/recommendations/{consumerId}/recommendations": {
+      "get": {
+        "tags": [
+          "Recommendations"
+        ],
+        "summary": "Get recommended products",
+        "description": "Get recommended products",
+        "operationId": "getRecommendedProducts",
+        "parameters": [
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "description": "Number recommended products"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of recommended products",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/consumerId"
+        }
+      ]
+    },
+    "/basket/{consumerId}": {
+      "get": {
+        "tags": [
+          "Basket"
+        ],
+        "summary": "Get basket",
+        "description": "Get basket",
+        "operationId": "getBasket",
+        "responses": {
+          "200": {
+            "description": "List of products in the basket",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Basket"
+        ],
+        "summary": "Add product to basket",
+        "description": "Add product to basket",
+        "operationId": "addProductToBasket",
+        "requestBody": {
+          "description": "Product to add to basket",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref" : "#/components/schemas/ProductQuantity"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated basket",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Basket"
+        ],
+        "summary": "Remove product from  basket",
+        "description": "Remove product from  basket",
+        "operationId": "removeProductFromBasket",
+        "requestBody": {
+          "description": "Product to remove from basket",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref" : "#/components/schemas/ProductQuantity"
+              },
+              "examples": {
+                "Remove product from  basket": {
+                  "value": {
+                    "product": "65668e55a3f8dfb5ef137c86",
+                    "quantity": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated basket",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/consumerId"
+        }
+      ]
+    },
+    "/": {
+      "get": {
+        "tags": [
+          "Consumers"
+        ],
+        "summary": "Get all consumers",
+        "operationId": "getAllConsumers",
+        "responses": {
+          "200": {
+            "description": "List of consumers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Consumer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Consumers"
+        ],
+        "summary": "Create consumer",
+        "description": "Create consumer",
+        "operationId": "createConsumer",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/Consumer"
+        },
+        "responses": {
+          "200": {
+            "description": "Newly created consumer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Consumer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{consumerId}": {
+      "get": {
+        "tags": [
+          "Consumers"
+        ],
+        "summary": "Get consumer by Id",
+        "description": "Get consumer by Id",
+        "operationId": "getConsumerById",
+        "responses": {
+          "200": {
+            "description": "Consumer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Consumer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Consumers"
+        ],
+        "summary": "Update consumer",
+        "description": "Update consumer",
+        "operationId": "updateConsumer",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/Consumer"
+        },
+        "responses": {
+          "200": {
+            "description": "Updated consumer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Consumer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Consumers"
+        ],
+        "summary": "Delete consumer",
+        "description": "Delete consumer",
+        "operationId": "deleteConsumer",
+        "responses": {
+          "200": {
+            "description": "Consumer deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Consumer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/consumerId"
+        }
+      ]
+    }
+  },
+  "tags": [
+    {
+      "name": "Consumers"
+    },
+    {
+      "name": "Basket"
+    },
+    {
+      "name": "Notifications"
+    },
+    {
+      "name": "Recommendations"
+    }
+  ]
 }
