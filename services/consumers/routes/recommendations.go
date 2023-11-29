@@ -8,10 +8,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func getRecommendedProducts(c *gin.Context, numberOfRecommendations int) {
-	consumerId := c.Param("consumerId")
+	consumerId, err := primitive.ObjectIDFromHex(c.Param("consumerId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	consumerCollection := database.GetDatabase().Collection("consumers")
 
@@ -34,7 +39,11 @@ func getRecommendedProducts(c *gin.Context, numberOfRecommendations int) {
 }
 
 func getRecommendationsForCategory(c *gin.Context, numberOfRecommendations int) {
-	consumerId := c.Param("consumerId")
+	consumerId, err := primitive.ObjectIDFromHex(c.Param("consumerId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	category := c.Param("category")
 
 	consumerCollection := database.GetDatabase().Collection("consumers")
@@ -51,6 +60,11 @@ func getRecommendationsForCategory(c *gin.Context, numberOfRecommendations int) 
 			relatedProductsOfCategory = append(relatedProductsOfCategory, product)
 			numberOfRecommendations--
 		}
+	}
+
+	if len(relatedProductsOfCategory) == 0 {
+		c.JSON(http.StatusNoContent, gin.H{})
+		return
 	}
 
 	c.JSON(http.StatusOK, relatedProductsOfCategory)
