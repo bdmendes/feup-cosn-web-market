@@ -6,26 +6,30 @@ import (
 	"cosn/delivery/model"
 	"math/rand"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func getDeliveryData(c *gin.Context) {
 	deliveryCollection := database.GetDatabase().Collection("delivery")
 
-	orderId := c.Param("orderId")
+	orderId, err := primitive.ObjectIDFromHex(c.Param("orderId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	var delivery model.Delivery
-	err := deliveryCollection.FindOne(context.Background(), bson.M{"order_id": orderId}).Decode(&delivery)
+	err = deliveryCollection.FindOne(context.Background(), bson.M{"order_id": orderId}).Decode(&delivery)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Delivery not found"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusOK, delivery)
 }
 
 func createDelivery(c *gin.Context) {
@@ -59,51 +63,43 @@ func createDelivery(c *gin.Context) {
 		panic(err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{})
+	c.Status(http.StatusOK)
 }
 
 func markDeliveryAsDone(c *gin.Context) {
 	deliveryCollection := database.GetDatabase().Collection("delivery")
 
-	orderId := c.Param("orderId")
-
-	if orderId == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing orderId"})
-		return
-	}
-
-	orderIdInt, err := strconv.ParseInt(orderId, 10, 64)
-
+	orderId, err := primitive.ObjectIDFromHex(c.Param("orderId"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid orderId"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var delivery model.Delivery
-	err = deliveryCollection.FindOne(context.Background(), bson.M{"order_id": orderIdInt}).Decode(&delivery)
+	err = deliveryCollection.FindOne(context.Background(), bson.M{"order_id": orderId}).Decode(&delivery)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Delivery not found"})
 		return
 	}
 
 	if delivery.IsDone() {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Delivery already done"})
+		c.JSON(http.StatusNotModified, "Delivery already done")
 		return
 	}
 
 	delivery.DeliveryDateTime = time.Now().Format(time.RFC3339)
 
-	_, err = deliveryCollection.UpdateOne(context.Background(), bson.M{"order_id": orderIdInt}, bson.M{"$set": delivery})
+	_, err = deliveryCollection.UpdateOne(context.Background(), bson.M{"order_id": orderId}, bson.M{"$set": delivery})
 
 	if err != nil {
 		panic(err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{})
+	c.Status(http.StatusOK)
 }
 
 func AddDeliveryRoutes(rg *gin.RouterGroup) {
 	rg.GET("/:orderId", getDeliveryData)
-	rg.POST("/:orderId", createDelivery)
+	rg.POST("/", createDelivery)
 	rg.POST("/:orderId/markAsDone", markDeliveryAsDone)
 }
