@@ -1,126 +1,312 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-        "title": "Orders service",
-        "version": "1.0.0"
-    },
-    "paths": {
-        "/api/orders/clients/{id}": {
-            "get": {
-                "summary": "Get all the orders of a client",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "orders": [
-                                        {
-                                            "order_id": 1,
-                                            "client_id": 123,
-                                            "status": "Pending"
-                                        },
-                                        {
-                                            "order_id": 2,
-                                            "client_id": 123,
-                                            "status": "Shipped"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/orders": {
-            "post": {
-                "summary": "Submit a new order",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "example": {
-                                "client_id": 123,
-                                "products": [
-                                    {
-                                        "product_id": 456,
-                                        "quantity": 2
-                                    },
-                                    {
-                                        "product_id": 789,
-                                        "quantity": 1
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Order created successfully",
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "order_id": 3
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/orders/{id}": {
-            "put": {
-                "summary": "Update an existing order (status update or cancellation)",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "example": {
-                                "status": "Cancelled"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Order updated successfully",
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "message": "Order status updated to Cancelled"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "x-readme": {
-        "explorer-enabled": true,
-        "proxy-enabled": true,
-        "samples-enabled": true
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Orders Service",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8080"
     }
+  ],
+  "components": {
+    "schemas": {
+      "ProductQuantity": {
+        "type": "object",
+        "properties": {
+          "Product": {
+            "type": "string",
+            "example": "65668e55a3f8dfb5ef137c86"
+          },
+          "Quantity": {
+            "type": "number",
+            "example": 1
+          }
+        }
+      },
+      "Payment": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "example": 12.5
+          },
+          "payment_data": {
+            "type": "string",
+            "example": "1234123412341234"
+          },
+          "payment_method": {
+            "type": "string",
+            "example": "paypal"
+          }
+        }
+      },
+      "OrderStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "AUTHORIZED",
+          "SHIPPED",
+          "DELIVERED",
+          "CANCELLED"
+        ]
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "6567f5b4da17568d880d2c9a"
+          },
+          "client_id": {
+            "type": "string",
+            "example": "507f1f77bcf86cd799439011"
+          },
+          "description": {
+            "type": "string",
+            "example": "New order notes"
+          },
+          "location": {
+            "type": "string",
+            "example": "Rua Dr Roberto Frias, s/n, 4200-465 Porto, Portugal"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductQuantity"
+            }
+          },
+          "date": {
+            "type": "string",
+            "example": "2020-05-01T00:00:00.000Z"
+          },
+          "interval_days": {
+            "type": "number",
+            "example": 2
+          },
+          "express_delivery": {
+            "type": "boolean",
+            "example": false
+          },
+          "payment": {
+            "$ref": "#/components/schemas/Payment"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          }
+        }
+      }
+    },
+    "requestBodies": {
+      "NewOrder": {
+        "description": "New order data",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "client_id": {
+                  "type": "string",
+                  "example": "507f1f77bcf86cd799439011"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "New order notes"
+                },
+                "location": {
+                  "type": "string",
+                  "example": "Rua Dr Roberto Frias, s/n, 4200-465 Porto, Portugal"
+                },
+                "products": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductQuantity"
+                  }
+                },
+                "payment": {
+                  "$ref": "#/components/schemas/Payment"
+                },
+                "interval_days": {
+                  "type": "number",
+                  "example": 2
+                },
+                "express_delivery": {
+                  "type": "boolean",
+                  "example": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "UpdateOrder": {
+        "description": "Update order data",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "location": {
+                  "type": "string",
+                  "example": "Rua Dr Roberto Frias, s/n, 4200-465 Porto, Portugal"
+                },
+                "payment": {
+                  "$ref": "#/components/schemas/Payment"
+                },
+                "interval_days": {
+                  "type": "number",
+                  "example": 2
+                },
+                "status": {
+                  "$ref": "#/components/schemas/OrderStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "orderId": {
+        "name": "orderId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "6567f5b4da17568d880d2c9a"
+        }
+      }
+    }
+  },
+  "paths": {
+    "/orders": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Get orders",
+        "description": "Get orders",
+        "operationId": "getOrders",
+        "responses": {
+          "200": {
+            "description": "List of all orders",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Order"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Create order",
+        "description": "Create order",
+        "operationId": "createOrder",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/NewOrder"
+        },
+        "responses": {
+          "201": {
+            "description": "New order created"
+          }
+        }
+      }
+    },
+    "/orders/{orderId}": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Get order by id",
+        "description": "Get order by id",
+        "operationId": "getOrderById",
+        "responses": {
+          "200": {
+            "description": "Order found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Update order",
+        "description": "Update order",
+        "operationId": "updateOrder",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/UpdateOrder"
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/orderId"
+        }
+      ]
+    },
+    "/orders/clients/{clientId}": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Get client orders",
+        "description": "Get client orders",
+        "operationId": "getClientOrders",
+        "responses": {
+          "200": {
+            "description": "List of all client orders",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Order"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "clientId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": "507f1f77bcf86cd799439011"
+          }
+        }
+      ]
+    }
+  },
+  "tags": [
+    {
+      "name": "Orders",
+      "description": "Orders operations"
+    }
+  ]
 }

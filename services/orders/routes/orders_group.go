@@ -189,7 +189,7 @@ func createOrder(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{})
+	c.Status(http.StatusCreated)
 
 	order.ID = doc.InsertedID.(primitive.ObjectID)
 
