@@ -1,0 +1,33 @@
+name: Update API docs
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  rdme-openapi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Update consumers service API docs
+        uses: readmeio/rdme@v8
+        with:
+          rdme: openapi docs/api-specs/consumers-service.json --key=${{ secrets.README_API_KEY }} --id=656809a7c17d860023ad499a
+
+      - name: Update orders service API docs
+        uses: readmeio/rdme@v8
+        with:
+          rdme: openapi docs/api-specs/orders-service.json --key=${{ secrets.README_API_KEY }} --id=6568096dfec4a2004fa21466
+
+      - name: Update payment service API docs
+        uses: readmeio/rdme@v8
+        with:
+          rdme: openapi docs/api-specs/payment-service.json --key=${{ secrets.README_API_KEY }} --id=65680944b254b1001cacc268
+      
+      - name: Update delivery service API docs
+        uses: readmeio/rdme@v8
+        with:
+          rdme: openapi docs/api-specs/delivery-service.json --key=${{ secrets.README_API_KEY }} --id=6568098b9441db001cfb1003
