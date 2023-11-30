@@ -63,7 +63,7 @@ func createDelivery(c *gin.Context) {
 		panic(err)
 	}
 
-	c.Status(http.StatusOK)
+	c.Status(http.StatusCreated)
 }
 
 func markDeliveryAsDone(c *gin.Context) {

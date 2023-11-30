@@ -1,42 +1,156 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-        "title": "Delivery service",
-        "version": "1.0.0"
-    },
-    "paths": {
-        "/api/delivery": {
-            "post": {
-                "summary": "Delivery request",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "example": {
-                                "order_id": 3,
-                                "delivery_address": "123 Main St, City"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Delivery request successful",
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "message": "Delivery request placed"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "x-readme": {
-        "explorer-enabled": true,
-        "proxy-enabled": true,
-        "samples-enabled": true
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Delivery Service",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8000"
     }
+  ],
+  "components": {
+    "schemas": {
+      "Delivery": {
+        "type": "object",
+        "properties": {
+          "express_delivery": {
+            "type": "boolean",
+            "example": false
+          },
+          "location": {
+            "type": "string",
+            "example": "Rua Dr. Roberto Frias, s/n, 4200-465 Porto,Portugal"
+          },
+          "order_id": {
+            "type": "string",
+            "example": "6567cf8df8649da2f5e573f1"
+          },
+          "delivery_datetime": {
+            "type": "string",
+            "example": "2021-05-03T15:00:00.000Z"
+          },
+          "estimated_delivery_datetime": {
+            "type": "string",
+            "example": "2021-05-03T15:00:00.000Z"
+          }
+        }
+      }
+    },
+    "requestBodies": {
+      "Delivery": {
+        "description": "Delivery information",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "express_delivery": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "location": {
+                  "type": "string",
+                  "example": "Rua Dr. Roberto Frias, s/n, 4200-465 Porto,Portugal"
+                },
+                "order_id": {
+                  "type": "string",
+                  "example": "6567cf8df8649da2f5e573f1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "orderId": {
+        "name": "orderId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "6567cf8df8649da2f5e573f1"
+        }
+      }
+    }
+  },
+  "paths": {
+    "/{orderId}": {
+      "get": {
+        "tags": [
+          "Delivery"
+        ],
+        "summary": "Get delivery data",
+        "description": "Get delivery data",
+        "operationId": "getDeliveryData",
+        "responses": {
+          "200": {
+            "description": "Delivery data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Delivery"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/orderId"
+        }
+      ]
+    },
+    "/": {
+      "post": {
+        "tags": [
+          "Delivery"
+        ],
+        "summary": "Create delivery",
+        "description": "Create delivery",
+        "operationId": "createDelivery",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/Delivery"
+        },
+        "responses": {
+          "201": {
+            "description": "Created delivery"
+          }
+        }
+      }
+    },
+    "/{orderId}/markAsDone": {
+      "post": {
+        "tags": [
+          "Delivery"
+        ],
+        "summary": "Mark as done",
+        "description": "Mark as done",
+        "operationId": "markAsDone",
+        "responses": {
+          "200": {
+            "description": "Marked as done"
+          },
+          "304": {
+            "description": "Already marked as done"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/orderId"
+        }
+      ]
+    }
+  },
+  "tags": [
+    {
+      "name": "Delivery",
+      "description": "Delivery operations"
+    }
+  ]
 }
