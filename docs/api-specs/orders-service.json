@@ -38,6 +38,10 @@
           },
           "payment_method": {
             "type": "string",
+            "enum": [
+              "paypal",
+              "credit_card"
+            ],
             "example": "paypal"
           }
         }
