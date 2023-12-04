@@ -5,7 +5,7 @@ import (
 )
 
 type Delivery struct {
-	OrderID                   primitive.ObjectID `json:"order_id"`
+	OrderID                   primitive.ObjectID `json:"order_id" bson:"order_id"`
 	EstimatedDeliveryDateTime string             `json:"estimated_delivery_datetime"`
 	DeliveryDateTime          string             `json:"delivery_datetime"`
 	Location                  string             `json:"location"`
