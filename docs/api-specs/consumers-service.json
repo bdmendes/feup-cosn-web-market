@@ -518,16 +518,20 @@
   },
   "tags": [
     {
-      "name": "Consumers"
+      "name": "Consumers",
+      "description": "Consumers management"
     },
     {
-      "name": "Basket"
+      "name": "Basket",
+      "description": "Basket operations"
     },
     {
-      "name": "Notifications"
+      "name": "Notifications",
+      "description": "Notification operations"
     },
     {
-      "name": "Recommendations"
+      "name": "Recommendations",
+      "description": "Recommendation operations"
     }
   ]
 }
