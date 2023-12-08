@@ -34,6 +34,11 @@ The (direct) connections may be intercepted, in the final system, by a gateway t
 
 <!-- @spaghettiLover -->
 
+The Order Service, a pivotal microservice, is responsible for overseeing the comprehensive order processing workflow within the system. Beyond its primary function of receiving new orders, this service plays a fundamental role in the communication with the Payment Service for order validation and with the Delivery Service to facilitate the shipment of purchases.
+
+Outlined below are key operations managed by this microservice:
+
+
 ### Delivery
 
 <!-- @architectMaster -->
@@ -54,7 +59,7 @@ The (direct) connections may be intercepted, in the final system, by a gateway t
 
 ## Security implementation
 
-<!-- @spaghettiLover -->
+<!-- @bloatLover or @spaghettiLover -->
 
 <!-- SUPER SPAGHETTI CODE LEADS TO HIGH SECURITY DUE TO OBVIOUS REASONS -->
 
