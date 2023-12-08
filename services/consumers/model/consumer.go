@@ -69,7 +69,19 @@ func (consumer *Consumer) RelatedProducts(c *gin.Context) []Product {
 		return latestProducts[i].SimilarityMultiple(products) > latestProducts[j].SimilarityMultiple(products)
 	})
 
-	products = append(products, latestProducts...)
+	var uniqueProducts []Product
+	for _, product := range latestProducts {
+		var isUnique bool = true
+		for _, uniqueProduct := range uniqueProducts {
+			if product.ID == uniqueProduct.ID {
+				isUnique = false
+				break
+			}
+		}
+		if isUnique {
+			uniqueProducts = append(uniqueProducts, product)
+		}
+	}
 
-	return products
+	return uniqueProducts
 }
