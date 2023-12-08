@@ -13,6 +13,13 @@ type Product struct {
 	Prices      []float32
 }
 
+type ProductNotification struct {
+	ID          string  `json:"id"`
+	Description string  `json:"description"`
+	Category    string  `json:"category"`
+	Price       float32 `json:"price"`
+}
+
 type ProductQuantity struct {
 	Product  primitive.ObjectID
 	Quantity int
@@ -40,11 +47,11 @@ func (p *Product) Similarity(otherProduct *Product) float32 {
 	return baseSimilarity + descriptionSimilarity
 }
 
-func (p *Product) SimilarityMultiple(otherProducts []*Product) float32 {
+func (p *Product) SimilarityMultiple(otherProducts []Product) float32 {
 	fit := float32(0)
 
 	for _, product := range otherProducts {
-		similarity := p.Similarity(product)
+		similarity := p.Similarity(&product)
 		fit += similarity
 	}
 
