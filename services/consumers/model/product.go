@@ -13,6 +13,13 @@ type Product struct {
 	Prices      []float32
 }
 
+type ProductNotification struct {
+	ID          string  `json:"id"`
+	Description string  `json:"description"`
+	Category    string  `json:"category"`
+	Price       float32 `json:"price"`
+}
+
 type ProductQuantity struct {
 	Product  primitive.ObjectID
 	Quantity int
