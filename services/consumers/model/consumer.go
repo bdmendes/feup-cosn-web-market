@@ -24,7 +24,7 @@ type ConsumerRequestBody struct {
 
 func (consumer *Consumer) RelatedProducts(c *gin.Context) []Product {
 	var products []Product
-	// TODO: These should be a request to the products service
+
 	for _, productQuantity := range consumer.ShoppingCart {
 		var product Product
 		if err := database.GetDatabase().Collection("products").FindOne(c,

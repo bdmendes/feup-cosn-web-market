@@ -18,7 +18,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func getKafkaReader(topic string) *kafka.Reader {
+func getKafkaReader() *kafka.Reader {
 	kafkaHost := os.Getenv("KAFKA_HOST")
 	kafkaPort := os.Getenv("KAFKA_PORT")
 
@@ -26,6 +26,11 @@ func getKafkaReader(topic string) *kafka.Reader {
 
 	if kafkaHost == "" || kafkaPort == "" {
 		kafkaURL = "localhost:9092"
+	}
+
+	topic := os.Getenv("KAFKA_PRODUCTS_TOPIC")
+	if topic == "" {
+		topic = "products"
 	}
 
 	brokers := strings.Split(kafkaURL, ",")
@@ -39,7 +44,7 @@ func getKafkaReader(topic string) *kafka.Reader {
 }
 
 func ProductsConsumer() {
-	reader := getKafkaReader("products")
+	reader := getKafkaReader()
 	defer reader.Close()
 
 	for {
