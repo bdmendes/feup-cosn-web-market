@@ -47,11 +47,11 @@ func (p *Product) Similarity(otherProduct *Product) float32 {
 	return baseSimilarity + descriptionSimilarity
 }
 
-func (p *Product) SimilarityMultiple(otherProducts []*Product) float32 {
+func (p *Product) SimilarityMultiple(otherProducts []Product) float32 {
 	fit := float32(0)
 
 	for _, product := range otherProducts {
-		similarity := p.Similarity(product)
+		similarity := p.Similarity(&product)
 		fit += similarity
 	}
 

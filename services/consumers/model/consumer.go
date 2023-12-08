@@ -2,10 +2,12 @@ package model
 
 import (
 	"cosn/consumers/database"
+	"sort"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Consumer struct {
@@ -24,7 +26,6 @@ type ConsumerRequestBody struct {
 
 func (consumer *Consumer) RelatedProducts(c *gin.Context) []Product {
 	var products []Product
-	// TODO: These should be a request to the products service
 	for _, productQuantity := range consumer.ShoppingCart {
 		var product Product
 		if err := database.GetDatabase().Collection("products").FindOne(c,
@@ -52,6 +53,22 @@ func (consumer *Consumer) RelatedProducts(c *gin.Context) []Product {
 
 		products = append(products, product)
 	}
+
+	var latestProducts []Product
+	opts := options.Find().SetLimit(20).SetSort(bson.M{"_id": -1})
+	cursor, err := database.GetDatabase().Collection("products").Find(c, bson.M{}, opts)
+	if err != nil {
+		panic("Failed to get products: " + err.Error())
+	}
+	if err := cursor.All(c, &latestProducts); err != nil {
+		panic("Failed to get products: " + err.Error())
+	}
+
+	sort.Slice(latestProducts, func(i, j int) bool {
+		return latestProducts[i].SimilarityMultiple(products) > latestProducts[j].SimilarityMultiple(products)
+	})
+
+	products = append(products, latestProducts...)
 
 	return products
 }
