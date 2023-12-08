@@ -41,5 +41,7 @@ func main() {
 
 	router := setupRouter()
 
+	routes.ProductsConsumer()
+
 	router.Run(":" + port)
 }
