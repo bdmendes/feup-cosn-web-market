@@ -8,6 +8,10 @@
         {
             "url": "http://127.0.0.1:8002",
             "description": "Local server"
+        },
+        {
+          "description": "Production server",
+          "url": "http://payments.gentlesea-f6ac112d.westeurope.azurecontainerapps.io"
         }
     ],
     "components": {
