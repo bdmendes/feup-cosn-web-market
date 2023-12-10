@@ -1,0 +1,135 @@
+name: Build and deploy on azure
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  static-security-check:
+    runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # - name: Consumers dependencies
+      #   run: |
+      #     cd services/consumers
+      #     go mod download
+
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: ./services/consumers/...
+
+      - name: Orders dependencies
+        run: |
+          cd services/orders
+          go mod download
+
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: ./services/orders/...
+
+      - name: Delivery dependencies
+        run: |
+          cd delivery/consumers
+          go mod download
+
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: ./services/delivery/...
+
+      - name: Payments dependencies
+        run: |
+          cd payments/consumers
+          go mod download
+
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: ./services/payments/...
+
+  consumers:
+    runs-on: ubuntu-latest
+    needs: static-security-check
+    env:
+      GO111MODULE: on
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Navigate to consumers service
+        run: cd services/consumers
+
+      - name: Build and tag image
+        run: docker build -t haasregistry.azurecr.io/consumers:latest .
+
+      - name: Login to registry
+        run: docker login haasregistry.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} -p ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      - name: Push image to registry
+        run: docker push haasregistry.azurecr.io/consumers:latest
+
+  orders:
+    runs-on: ubuntu-latest
+    needs: static-security-check
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Navigate to orders service
+        run: cd services/orders
+
+      - name: Build and tag image
+        run: docker build -t haasregistry.azurecr.io/orders:latest .
+
+      - name: Login to registry
+        run: docker login haasregistry.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} -p ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      - name: Push image to registry
+        run: docker push haasregistry.azurecr.io/orders:latest
+
+  delivery:
+    runs-on: ubuntu-latest
+    needs: static-security-check
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Navigate to delivery service
+        run: cd services/delivery
+
+      - name: Build and tag image
+        run: docker build -t haasregistry.azurecr.io/delivery:latest .
+
+      - name: Login to registry
+        run: docker login haasregistry.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} -p ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      - name: Push image to registry
+        run: docker push haasregistry.azurecr.io/delivery:latest
+  payments:
+    runs-on: ubuntu-latest
+    needs: static-security-check
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Navigate to payments service
+        run: cd services/payments
+
+      - name: Build and tag image
+        run: docker build -t haasregistry.azurecr.io/payments:latest .
+
+      - name: Login to registry
+        run: docker login haasregistry.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} -p ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      - name: Push image to registry
+        run: docker push haasregistry.azurecr.io/payments:latest

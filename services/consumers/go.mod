@@ -1,6 +1,6 @@
 module cosn/consumers
 
-go 1.21.3
+go 1.21
 
 require (
 	github.com/adrg/strutil v0.3.1
