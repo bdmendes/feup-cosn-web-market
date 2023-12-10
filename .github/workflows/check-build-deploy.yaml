@@ -24,25 +24,21 @@ jobs:
       - name: Consumers check
         run: |
           cd services/consumers
-          go mod download
           $(go env GOPATH)/bin/gosec ./...
 
       - name: Orders check
         run: |
           cd services/orders
-          go mod download
           $(go env GOPATH)/bin/gosec ./...
 
       - name: Delivery check
         run: |
-          cd delivery/consumers
-          go mod download
+          cd services/delivery
           $(go env GOPATH)/bin/gosec ./...
 
       - name: Payments check
         run: |
-          cd payments/consumers
-          go mod download
+          cd services/payments
           $(go env GOPATH)/bin/gosec ./...
 
   consumers:
@@ -58,13 +54,13 @@ jobs:
         run: cd services/consumers
 
       - name: Build and tag image
-        run: docker build -t haasregistry.azurecr.io/consumers:latest .
+        run: docker build -t haasregistry.azurecr.io/consumers:{{ github.sha }} -t haasregistry.azurecr.io/consumers:latest . 
 
       - name: Login to registry
         run: docker login haasregistry.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} -p ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
       - name: Push image to registry
-        run: docker push haasregistry.azurecr.io/consumers:latest
+        run: docker push --all-tags haasregistry.azurecr.io/consumers
 
   orders:
     runs-on: ubuntu-latest
@@ -77,13 +73,13 @@ jobs:
         run: cd services/orders
 
       - name: Build and tag image
-        run: docker build -t haasregistry.azurecr.io/orders:latest .
+        run: docker build -t haasregistry.azurecr.io/orders:{{ github.sha }} -t haasregistry.azurecr.io/orders:latest .
 
       - name: Login to registry
         run: docker login haasregistry.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} -p ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
       - name: Push image to registry
-        run: docker push haasregistry.azurecr.io/orders:latest
+        run: docker push --all-tags haasregistry.azurecr.io/orders
 
   delivery:
     runs-on: ubuntu-latest
@@ -96,13 +92,13 @@ jobs:
         run: cd services/delivery
 
       - name: Build and tag image
-        run: docker build -t haasregistry.azurecr.io/delivery:latest .
+        run: docker build -t haasregistry.azurecr.io/delivery:{{ github.sha }} -t haasregistry.azurecr.io/delivery:latest .
 
       - name: Login to registry
         run: docker login haasregistry.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} -p ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
       - name: Push image to registry
-        run: docker push haasregistry.azurecr.io/delivery:latest
+        run: docker push --all-tags haasregistry.azurecr.io/delivery
   payments:
     runs-on: ubuntu-latest
     needs: static-security-check
@@ -114,10 +110,10 @@ jobs:
         run: cd services/payments
 
       - name: Build and tag image
-        run: docker build -t haasregistry.azurecr.io/payments:latest .
+        run: docker build -t haasregistry.azurecr.io/payments:{{ github.sha }} -t haasregistry.azurecr.io/payments:latest .
 
       - name: Login to registry
         run: docker login haasregistry.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} -p ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
       - name: Push image to registry
-        run: docker push haasregistry.azurecr.io/payments:latest
+        run: docker push --all-tags haasregistry.azurecr.io/payments
