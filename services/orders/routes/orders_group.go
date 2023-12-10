@@ -243,7 +243,11 @@ func updateOrder(c *gin.Context) {
 	}
 
 	order := model.Order{}
-	doc.Decode(&order)
+	err = doc.Decode(&order)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{})
 

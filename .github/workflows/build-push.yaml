@@ -1,0 +1,75 @@
+name: Build and push to azure registry
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  consumers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build and tag image
+        run: |
+          cd services/consumers
+          docker build -t haasregistry.azurecr.io/consumers:latest .
+
+      - name: Login to registry
+        run: docker login haasregistry.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} -p ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      - name: Push image to registry
+        run: docker push haasregistry.azurecr.io/consumers
+
+  orders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build and tag image
+        run: |
+          cd services/orders
+          docker build -t haasregistry.azurecr.io/orders:latest .
+
+      - name: Login to registry
+        run: docker login haasregistry.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} -p ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      - name: Push image to registry
+        run: docker push haasregistry.azurecr.io/orders
+
+  delivery:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build and tag image
+        run: |
+          cd services/delivery
+          docker build -t haasregistry.azurecr.io/delivery:latest .
+
+      - name: Login to registry
+        run: docker login haasregistry.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} -p ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      - name: Push image to registry
+        run: docker push haasregistry.azurecr.io/delivery
+
+  payments:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build and tag image
+        run: |
+          cd services/payments
+          docker build -t haasregistry.azurecr.io/payments:latest .
+
+      - name: Login to registry
+        run: docker login haasregistry.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} -p ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      - name: Push image to registry
+        run: docker push haasregistry.azurecr.io/payments

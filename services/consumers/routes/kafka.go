@@ -4,7 +4,7 @@ import (
 	"context"
 	"cosn/consumers/database"
 	"cosn/consumers/model"
-	"crypto/md5"
+	"crypto/md5" // #nosec G501
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -65,7 +65,7 @@ func ProductsConsumer() {
 func createOrUpdateProduct(productNotification model.ProductNotification) {
 	productsCollection := database.GetDatabase().Collection("products")
 
-	hasher := md5.New()
+	hasher := md5.New() // #nosec G401
 	hasher.Write([]byte(productNotification.ID))
 	hash := hasher.Sum(nil)
 
