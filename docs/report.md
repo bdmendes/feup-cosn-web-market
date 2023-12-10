@@ -31,8 +31,12 @@ All services have been developed using Go, and each service is equipped with its
 ### Consumers
 
 <!-- @architectMaster + @spaghettiLover(kafka) -->
+<!-- @architectMaster change according to your recommendation part -->
+Finally, to effortlessly update the product view, the Consumers service expects either new products or partial updates, to be announced via Kafka. This is useful to enhance the recommendation system.
 
-Outlined below are key operations managed by this microservice:
+#### Key operations
+
+- Listen messages published in the broker of product updates
 
 ### Orders
 
@@ -55,7 +59,7 @@ To facilitate the management of each order, there are 5 different states to cont
 
 ![Order State Diagram](./assets/order_state_diagram.png)
 
-Outlined below are key operations managed by this microservice:
+#### Key operations
 
 - Create a new order.
 - Update an existing order.
@@ -69,9 +73,15 @@ Outlined below are key operations managed by this microservice:
 
 <!-- @architectMaster -->
 
+#### Key operations
+
 ### Payments
 
-<!-- @spaghettiLover -->
+The Payments service plays a crucial role in validating each order's payment. To simulate real-world scenarios, a mock service has been implemented, wherein payment data is validated, and a 20% chance of failure is introduced to emulate potential issues.
+
+#### Key operations
+
+- Validation of order payments
 
 ## Resilience Patterns
 - specification and implementation (minimum of 2)
@@ -91,4 +101,4 @@ Outlined below are key operations managed by this microservice:
 
 ## Link to Service APIs specification in OpenAPI
 
-<!-- @bloatLover -->
+https://haas-interaction.readme.io/
