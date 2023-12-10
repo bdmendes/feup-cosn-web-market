@@ -80,7 +80,8 @@ func createOrUpdateProduct(productNotification model.ProductNotification) {
 	if err != nil { // create product
 		product.ID = product_id
 		product.Category = productNotification.Category
-		product.Description = productNotification.Description
+		product.Name = productNotification.Name
+		product.Brand = productNotification.Brand
 		product.Prices = []float32{productNotification.Price}
 
 		if _, err = productsCollection.InsertOne(context.Background(), product); err != nil {
@@ -88,7 +89,8 @@ func createOrUpdateProduct(productNotification model.ProductNotification) {
 		}
 	} else { // update product
 		product.Category = productNotification.Category
-		product.Description = productNotification.Description
+		product.Name = productNotification.Name
+		product.Brand = productNotification.Brand
 		product.Prices = append(product.Prices, productNotification.Price)
 
 		if _, err = productsCollection.UpdateOne(context.Background(), bson.M{"_id": product_id}, bson.M{"$set": product}); err != nil {

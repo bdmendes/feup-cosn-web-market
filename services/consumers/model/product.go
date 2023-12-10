@@ -7,17 +7,19 @@ import (
 )
 
 type Product struct {
-	ID          primitive.ObjectID `bson:"_id" json:"_id"`
-	Description string
-	Category    string
-	Prices      []float32
+	ID       primitive.ObjectID `bson:"_id" json:"_id"`
+	Name     string
+	Category string
+	Brand    string
+	Prices   []float32
 }
 
 type ProductNotification struct {
-	ID          string  `json:"id"`
-	Description string  `json:"description"`
-	Category    string  `json:"category"`
-	Price       float32 `json:"price"`
+	ID       string  `json:"id"`
+	Name     string  `json:"name"`
+	Category string  `json:"category"`
+	Brand    string  `json:"brand"`
+	Price    float32 `json:"price"`
 }
 
 type ProductQuantity struct {
@@ -37,14 +39,18 @@ func (p *Product) Similarity(otherProduct *Product) float32 {
 	baseSimilarity := float32(0)
 
 	if p.Category == otherProduct.Category {
-		baseSimilarity = 0.5
+		baseSimilarity += 0.25
+	}
+
+	if p.Brand == otherProduct.Brand {
+		baseSimilarity += 0.25
 	}
 
 	lev := metrics.NewLevenshtein()
 	lev.CaseSensitive = false
-	descriptionSimilarity := float32(strutil.Similarity(p.Description, otherProduct.Description, lev)) / 2
+	nameSimilarity := float32(strutil.Similarity(p.Name, otherProduct.Name, lev)) / 2
 
-	return baseSimilarity + descriptionSimilarity
+	return baseSimilarity + nameSimilarity
 }
 
 func (p *Product) SimilarityMultiple(otherProducts []Product) float32 {
