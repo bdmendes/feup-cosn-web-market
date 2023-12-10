@@ -17,7 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # - name: Consumers dependencies
+      # - name: Consumers dependencies #
       #   run: |
       #     cd services/consumers
       #     go mod download
