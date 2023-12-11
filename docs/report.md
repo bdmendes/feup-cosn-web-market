@@ -1,14 +1,18 @@
 # HaaS Web Market
 
-<!-- SET: @architectMaster = @bdmendes -->
-<!-- SET: @bloatLover = @sirze -->
-<!-- SET: @spaghettiLover = @fernandorego -->
+*HaaS* (short for "Hygiene as a Service") is a platform aimed at consumers at home expecting regular income of day-to-day products. It leverages schedulable orders, product recommendations and price drop alerts.
+
+This project is a proposed implementation of the platform in a microservices architecture. Our team is responsible for a subsystem detailed in the following sections.
+
+## APIs specification (OpenAPI)
+
+All implemented endpoints are described and documented in https://haas-interaction.readme.io/, which is continuosly updated via our CI/CD pipeline.
 
 ## Architectural system design
 
 Our subsystem is designed in a microservices architecture. Given the considerable size of the development team (the whole class) and the requisite to support a very large number of users, this allows us to achieve scalability, fault isolation and ease of development.
 
-As expected, each microservice has its own database. We are following a "domain-driven design" approach, which means that each microservice is responsible for a specific domain of the system. This allows us to achieve a high degree of cohesion and low coupling between the services. Communications between services are kept to a minimum, and are mainly done asynchronously.
+As expected, each microservice has its database. We are following a "domain-driven design" approach, which means that each microservice is responsible for a specific domain of the system. This allows us to achieve a high degree of cohesion and low coupling between the services. Communications between services are kept to a minimum and are mainly done asynchronously.
 
 ### Domain model
 
@@ -40,13 +44,13 @@ All services have been developed using Go, and each service is equipped with its
 
 ### Consumers
 
-The *Consumers* microservice is responsible for managing the consumers of the system. Consequently, it also manages their shopping cart, registered product price drop alerts, and leverages a lightweight product reccomendation system.
+The *Consumers* microservice is responsible for managing the consumers of the system. Consequently, it also manages their shopping cart, registered product price drop alerts, and leverages a lightweight product recommendation system.
 
-To allow for all product-related features, we keep a local view of the products in the system. This is updated asynchronously through Kafka, whenever a product is created or updated. This allows us to avoid unnecessary requests to the *Stock* service, which is responsible for managing the products and maintaining the actual products database.
+To allow for all product-related features, we keep a local view of the products in the system. This is updated asynchronously through Kafka, whenever a product is created or updated. This allows us to avoid unnecessary requests to the *Stock* service, which is responsible for managing the products and maintaining the actual product database.
 
 The shopping cart is a list of products the user is interested in. It may be used by a frontend application to quickly bootstrap an order (as a result of a "checkout" operation), or simply be viewed as a wishlist. It is also useful to the recommendations infrastructure, as explained below.
 
-The reccomendations module suggests a list of products to a consumer based on its shopping cart, past orders and registered price drop alerts. The products in the local database are ordered by similarity against them. The similiraty is given by factors such as category, brand and Levenshtein distance between the descriptions.
+The recommendations module suggests a list of products to a consumer based on their shopping cart, past orders and registered price drop alerts. The products in the local database are ordered by similarity against them. The similarity is given by factors such as category, brand and Levenshtein distance between the descriptions.
 
 #### Key operations
 
@@ -101,7 +105,7 @@ Our *Delivery* service is by design a very simple service. Since the *Haas Web M
 
 #### Key operations
 
-- Get delivery status for an order
+- Get the delivery status for an order
 - Request delivery for an order
 - Mark an order as delivered
 
@@ -115,7 +119,7 @@ The Payments service plays a crucial role in validating each order's payment. To
 
 ## Resilience Patterns
 
-The microservices architecture is a distributed system, which means that it is prone to failures. In spite of this, it is straightforward to deploy them to a resilient infrastructure such as Kubernetes, which allows us to achieve high availability and fault tolerance, by automatically handling failures and scaling the system as needed.
+The microservices architecture is a distributed system, which means that it is prone to failures. Despite this, it is straightforward to deploy them to a resilient infrastructure such as Kubernetes, which allows us to achieve high availability and fault tolerance, by automatically handling failures and scaling the system as needed.
 
 Besides this, we implemented a few resilience patterns to further improve the robustness of our system.
 
@@ -125,11 +129,11 @@ Our *Payments* microservice does not store any local data (in a real-world scena
 
 ### Data partitioning
 
-Our *Consumers* microservice holds a local view of the products in the system. This allows us to avoid unnecessary requests to the *Stock* service, but also to serve as a backup in case the *Stock* service is unavailable. This is a form of data partitioning, which allows us to achieve fault tolerance.
+Our *Consumers* microservice holds a local view of the products in the system. This allows us to avoid unnecessary requests for the _Stock_* service, but also to serve as a backup in case the *Stock* service is unavailable. This is a form of data partitioning, which allows us to achieve fault tolerance.
 
 ## Observability patterns
 
-In a microservices system, it is important to have a way to monitor the health of the system, and to be able to debug it in case of failures. In our system, the *API Gateway subsystem* is the main responsible for the latter. In the following subsections, we briefly describe the observability patterns that we implemented.
+In a microservices system, it is important to have a way to monitor the health of the system and to be able to debug it in case of failures. In our system, the *API Gateway subsystem* is the main responsible for the latter. In the following subsections, we briefly describe the observability patterns that we implemented.
 
 ### Health check
 
@@ -141,10 +145,10 @@ As explained above, we did not implement any communication announcement to any K
 
 ## Security implementation
 
-<!-- @bloatLover or @spaghettiLover -->
+We rely on the API gateway functionality to ensure all incoming requests to our services are properly authenticated and authorized, which should render the attack surface small, for starters. Although not implemented as of now, we see signing requests with assymetric keys as desirable future work to raise trust inside our infrastructure.
 
-<!-- SUPER SPAGHETTI CODE LEADS TO HIGH SECURITY DUE TO OBVIOUS REASONS -->
+On top of this, we use *GoSec*, a static source code analyzer that checks for common issues such as DoS vulnerabilities, hardcoded credentials or out of bounds accesses. It has helped to solve code smells that could lead to service denials or data exploitation in extreme edge cases.
 
-## Link to Service APIs specification in OpenAPI
+## Conclusion
 
-https://haas-interaction.readme.io/
+Our subset of *HaaS* is as of now a reliable subsystem that fullfills the initial base requirements (MVP) and is thus able to be shipped. We also pointed out future work, such as security enhancements, that we feel will improve the quality of the product further in the future.
