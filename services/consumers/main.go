@@ -49,5 +49,8 @@ func main() {
 
 	go routes.ProductsConsumer()
 
-	router.Run(":" + port)
+	err := router.Run(":" + port)
+	if err != nil {
+		panic(err)
+	}
 }

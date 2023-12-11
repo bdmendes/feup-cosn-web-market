@@ -38,5 +38,8 @@ func main() {
 
 	router := setupRouter()
 
-	router.Run(":" + port)
+	err := router.Run(":" + port)
+	if err != nil {
+		panic(err)
+	}
 }

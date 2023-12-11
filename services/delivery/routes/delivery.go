@@ -45,11 +45,11 @@ func createDelivery(c *gin.Context) {
 	currentDateTime := time.Now()
 
 	// Random delivery time between 10 minutes and 3 hours for all deliveries
-	deliveryDateTime := currentDateTime.Add(time.Duration(float64(10+rand.Intn(170)) * time.Duration.Minutes(1)))
+	deliveryDateTime := currentDateTime.Add(time.Duration(float64(10+rand.Intn(170)) * time.Duration.Minutes(1))) // #nosec G404
 
 	if !deliveryRequestData.ExpressDelivery {
 		// Add between 1 and 3 days for non-express deliveries
-		deliveryDateTime = deliveryDateTime.Add(time.Duration(float64(1+rand.Intn(3)) * time.Duration.Hours(24)))
+		deliveryDateTime = deliveryDateTime.Add(time.Duration(float64(1+rand.Intn(3)) * time.Duration.Hours(24))) // #nosec G404
 	}
 
 	var delivery model.Delivery

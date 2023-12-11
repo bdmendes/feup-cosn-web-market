@@ -57,6 +57,7 @@ func (p *Product) SimilarityMultiple(otherProducts []Product) float32 {
 	fit := float32(0)
 
 	for _, product := range otherProducts {
+		product := product
 		similarity := p.Similarity(&product)
 		fit += similarity
 	}

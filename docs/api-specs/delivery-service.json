@@ -8,6 +8,10 @@
   "servers": [
     {
       "url": "http://127.0.0.1:8001"
+    },
+    {
+      "description": "Production server",
+      "url": "http://delivery.gentlesea-f6ac112d.westeurope.azurecontainerapps.io"
     }
   ],
   "components": {

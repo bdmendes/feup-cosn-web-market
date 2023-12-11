@@ -1,0 +1,38 @@
+name: Static security check
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  static-security-check:
+    runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
+    steps:
+      - name: Install Gosec
+        run: |
+          curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.18.2
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Consumers check
+        run: |
+          cd services/consumers
+          $(go env GOPATH)/bin/gosec ./...
+
+      - name: Orders check
+        run: |
+          cd services/orders
+          $(go env GOPATH)/bin/gosec ./...
+
+      - name: Delivery check
+        run: |
+          cd services/delivery
+          $(go env GOPATH)/bin/gosec ./...
+
+      - name: Payments check
+        run: |
+          cd services/payments
+          $(go env GOPATH)/bin/gosec ./...
