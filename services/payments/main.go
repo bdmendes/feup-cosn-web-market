@@ -2,6 +2,7 @@ package main
 
 import (
 	"cosn/payments/database"
+	"cosn/payments/observability"
 	"cosn/payments/routes"
 	"fmt"
 	"os"
@@ -12,6 +13,11 @@ import (
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
+
+	router.Use(gin.Recovery())
+	router.Use(gin.Logger())
+
+	observability.AddHealthCheckRoutes(router)
 
 	exampleRouterGroup := router.Group("/payment")
 	routes.AddPaymentRoutes(exampleRouterGroup)
@@ -32,5 +38,8 @@ func main() {
 
 	router := setupRouter()
 
-	router.Run(":" + port)
+	err := router.Run(":" + port)
+	if err != nil {
+		panic(err)
+	}
 }

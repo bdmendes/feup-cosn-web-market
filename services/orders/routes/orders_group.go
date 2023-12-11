@@ -139,6 +139,7 @@ func paymentCallback(resp *http.Response, data map[string]interface{}) {
 			`", "express_delivery": ` + strconv.FormatBool(order.ExpressDelivery) +
 			`}`)
 
+		go PublishOrder(order)
 		go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL")+"/delivery", deliveryCallback, data)
 	} else {
 		fmt.Println("Payment failed: ", resp.Status)
@@ -242,7 +243,11 @@ func updateOrder(c *gin.Context) {
 	}
 
 	order := model.Order{}
-	doc.Decode(&order)
+	err = doc.Decode(&order)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{})
 

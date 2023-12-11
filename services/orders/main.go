@@ -2,6 +2,7 @@ package main
 
 import (
 	"cosn/orders/database"
+	"cosn/orders/observability"
 	"cosn/orders/routes"
 	"cosn/orders/tasks"
 	"fmt"
@@ -13,6 +14,11 @@ import (
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
+
+	router.Use(gin.Recovery())
+	router.Use(gin.Logger())
+
+	observability.AddHealthCheckRoutes(router)
 
 	ordersRouterGroup := router.Group("/orders")
 	routes.AddOrdersRoutes(ordersRouterGroup)
@@ -34,5 +40,8 @@ func main() {
 	go tasks.ScheduledOrdersTask()
 
 	router := setupRouter()
-	router.Run(":" + port)
+	err := router.Run(":" + port)
+	if err != nil {
+		panic(err)
+	}
 }

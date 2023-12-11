@@ -2,6 +2,7 @@ package main
 
 import (
 	"cosn/consumers/database"
+	"cosn/consumers/observability"
 	"cosn/consumers/routes"
 	"fmt"
 	"os"
@@ -12,6 +13,11 @@ import (
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
+
+	router.Use(gin.Recovery())
+	router.Use(gin.Logger())
+
+	observability.AddHealthCheckRoutes(router)
 
 	consumerRouterGroup := router.Group("/")
 	routes.AddConsumersRoutes(consumerRouterGroup)
@@ -41,5 +47,10 @@ func main() {
 
 	router := setupRouter()
 
-	router.Run(":" + port)
+	go routes.ProductsConsumer()
+
+	err := router.Run(":" + port)
+	if err != nil {
+		panic(err)
+	}
 }
