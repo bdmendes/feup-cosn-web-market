@@ -2,6 +2,7 @@ package main
 
 import (
 	"cosn/delivery/database"
+	"cosn/delivery/observability"
 	"cosn/delivery/routes"
 	"fmt"
 	"os"
@@ -12,6 +13,11 @@ import (
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
+
+	router.Use(gin.Recovery())
+	router.Use(gin.Logger())
+
+	observability.AddHealthCheckRoutes(router)
 
 	deliveryRouterGroup := router.Group("/")
 	routes.AddDeliveryRoutes(deliveryRouterGroup)
