@@ -3,9 +3,7 @@ package routes
 import (
 	"context"
 	"cosn/consumers/database"
-	"cosn/consumers/model"
-	"crypto/md5" // #nosec G501
-	"encoding/hex"
+	"cosn/consumers/model" // #nosec G501
 	"encoding/json"
 	"fmt"
 	"os"
@@ -14,7 +12,6 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/segmentio/kafka-go"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func getKafkaReader() *kafka.Reader {
@@ -64,20 +61,10 @@ func ProductsConsumer() {
 func createOrUpdateProduct(productNotification model.ProductNotification) {
 	productsCollection := database.GetDatabase().Collection("products")
 
-	hasher := md5.New() // #nosec G401
-	hasher.Write([]byte(productNotification.ID))
-	hash := hasher.Sum(nil)
-
-	product_id, err := primitive.ObjectIDFromHex(hex.EncodeToString(hash)[:24])
-	if err != nil {
-		fmt.Printf("error converting product id: %v\n", err)
-		return
-	}
-
 	var product model.Product
-	err = productsCollection.FindOne(context.Background(), bson.M{"_id": product_id}).Decode(&product)
+	err := productsCollection.FindOne(context.Background(), bson.M{"_id": productNotification.ID}).Decode(&product)
 	if err != nil { // create product
-		product.ID = product_id
+		product.ID = productNotification.ID
 		product.Category = productNotification.Category
 		product.Name = productNotification.Name
 		product.Brand = productNotification.Brand
@@ -92,7 +79,8 @@ func createOrUpdateProduct(productNotification model.ProductNotification) {
 		product.Brand = productNotification.Brand
 		product.Prices = append(product.Prices, productNotification.Price)
 
-		if _, err = productsCollection.UpdateOne(context.Background(), bson.M{"_id": product_id}, bson.M{"$set": product}); err != nil {
+		if _, err = productsCollection.UpdateOne(context.Background(),
+			bson.M{"_id": productNotification.ID}, bson.M{"$set": product}); err != nil {
 			fmt.Printf("error updating product: %v\n", err)
 		}
 	}
