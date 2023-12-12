@@ -8,7 +8,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -50,7 +49,7 @@ func ProductsConsumer() {
 	for {
 		m, err := reader.ReadMessage(context.Background())
 		if err != nil {
-			log.Fatalln(err)
+			fmt.Printf("error reading message: %v\n", err)
 		}
 
 		var productNotification model.ProductNotification
