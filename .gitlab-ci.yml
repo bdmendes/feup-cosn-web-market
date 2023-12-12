@@ -4,6 +4,10 @@ stages:
   - static-check
   - build-deploy
 
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+
 security-check-consumers:
   stage: static-check
   image: golang:latest
@@ -71,8 +75,8 @@ build-consumers:
     - docker push "$DOCKER_IMAGE_NAME"
     - |
       if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        docker tag "$DOCKER_IMAGE_NAME" haasregistry.azurecr.io/consumers:latest"
-        docker push --all-tags "haasregistry.azurecr.io/consumers:latest"
+        docker tag "$DOCKER_IMAGE_NAME" "haasregistry.azurecr.io/consumers:latest"
+        docker push "haasregistry.azurecr.io/consumers:latest"
       fi
 
 build-orders:
@@ -94,8 +98,8 @@ build-orders:
     - docker push "$DOCKER_IMAGE_NAME"
     - |
       if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        docker tag "$DOCKER_IMAGE_NAME" haasregistry.azurecr.io/orders:latest"
-        docker push --all-tags "haasregistry.azurecr.io/orders:latest"
+        docker tag "$DOCKER_IMAGE_NAME" "haasregistry.azurecr.io/orders:latest"
+        docker push "haasregistry.azurecr.io/orders:latest"
       fi
 
 build-delivery:
@@ -117,8 +121,8 @@ build-delivery:
     - docker push "$DOCKER_IMAGE_NAME"
     - |
       if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        docker tag "$DOCKER_IMAGE_NAME" haasregistry.azurecr.io/delivery:latest"
-        docker push --all-tags "haasregistry.azurecr.io/delivery:latest"
+        docker tag "$DOCKER_IMAGE_NAME" "haasregistry.azurecr.io/delivery:latest"
+        docker push "haasregistry.azurecr.io/delivery:latest"
       fi
 
 build-payments:
@@ -140,8 +144,8 @@ build-payments:
     - docker push "$DOCKER_IMAGE_NAME"
     - |
       if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        docker tag "$DOCKER_IMAGE_NAME" haasregistry.azurecr.io/payments:latest"
-        docker push --all-tags "haasregistry.azurecr.io/payments:latest"
+        docker tag "$DOCKER_IMAGE_NAME" "haasregistry.azurecr.io/payments:latest"
+        docker push "haasregistry.azurecr.io/payments:latest"
       fi
 
 deploy-api-docs:
@@ -153,16 +157,16 @@ deploy-api-docs:
     - npm install rdme@latest -g
     - rdme
       --key=$README_API_KEY
-      openapi docs/api-specs/consumers-service.json --key=$README_API_KEY --id=656809a7c17d860023ad499a
+      openapi docs/api-specs/consumers-service.json --id=656809a7c17d860023ad499a
 
     - rdme
       --key=$README_API_KEY
-      openapi docs/api-specs/orders-service.json --key=$README_API_KEY --id=6568096dfec4a2004fa21466
+      openapi docs/api-specs/orders-service.json --id=6568096dfec4a2004fa21466
 
     - rdme
       --key=$README_API_KEY
-      openapi docs/api-specs/payment-service.json --key=$README_API_KEY --id=65680944b254b1001cacc268
+      openapi docs/api-specs/payment-service.json --id=65680944b254b1001cacc268
 
     - rdme
       --key=$README_API_KEY
-      openapi docs/api-specs/delivery-service.json --key=$README_API_KEY --id=6568098b9441db001cfb1003
+      openapi docs/api-specs/delivery-service.json --id=6568098b9441db001cfb1003
