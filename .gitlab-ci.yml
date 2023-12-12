@@ -10,9 +10,8 @@ security-check-consumers:
   variables:
     GO111MODULE: "on"
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
     - curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.18.2
     - cd services/consumers && $(go env GOPATH)/bin/gosec ./...
@@ -23,9 +22,8 @@ security-check-orders:
   variables:
     GO111MODULE: "on"
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
     - curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.18.2
     - cd services/orders && $(go env GOPATH)/bin/gosec ./...
@@ -36,9 +34,8 @@ security-check-delivery:
   variables:
     GO111MODULE: "on"
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
     - curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.18.2
     - cd services/delivery && $(go env GOPATH)/bin/gosec ./...
@@ -49,20 +46,17 @@ security-check-payments:
   variables:
     GO111MODULE: "on"
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
     - curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.18.2
     - cd services/payments && $(go env GOPATH)/bin/gosec ./...
-
 
 build-consumers:
   image: docker:cli
   stage: build-deploy
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'push'
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   services:
     - docker:dind
   variables:
@@ -85,8 +79,7 @@ build-orders:
   image: docker:cli
   stage: build-deploy
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'push'
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   services:
     - docker:dind
   variables:
@@ -109,8 +102,7 @@ build-delivery:
   image: docker:cli
   stage: build-deploy
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'push'
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   services:
     - docker:dind
   variables:
@@ -133,8 +125,7 @@ build-payments:
   image: docker:cli
   stage: build-deploy
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'push'
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   services:
     - docker:dind
   variables:
@@ -157,22 +148,21 @@ deploy-api-docs:
   image: node:latest
   stage: build-deploy
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'push'
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
     - npm install rdme@latest -g
     - rdme
       --key=$README_API_KEY
-      openapi docs/api-specs/consumers-service.json --key=${{ secrets.README_API_KEY }} --id=656809a7c17d860023ad499a
+      openapi docs/api-specs/consumers-service.json --key=$README_API_KEY --id=656809a7c17d860023ad499a
 
     - rdme
       --key=$README_API_KEY
-      openapi docs/api-specs/orders-service.json --key=${{ secrets.README_API_KEY }} --id=6568096dfec4a2004fa21466
-    
-    - rdme
-      --key=$README_API_KEY
-      openapi docs/api-specs/payment-service.json --key=${{ secrets.README_API_KEY }} --id=65680944b254b1001cacc268
+      openapi docs/api-specs/orders-service.json --key=$README_API_KEY --id=6568096dfec4a2004fa21466
 
     - rdme
       --key=$README_API_KEY
-      openapi docs/api-specs/delivery-service.json --key=${{ secrets.README_API_KEY }} --id=6568098b9441db001cfb1003
+      openapi docs/api-specs/payment-service.json --key=$README_API_KEY --id=65680944b254b1001cacc268
+
+    - rdme
+      --key=$README_API_KEY
+      openapi docs/api-specs/delivery-service.json --key=$README_API_KEY --id=6568098b9441db001cfb1003
