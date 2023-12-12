@@ -1,0 +1,168 @@
+image: golang:latest
+
+stages:
+  - static-check
+  - build-deploy
+
+security-check-consumers:
+  stage: static-check
+  image: golang:latest
+  variables:
+    GO111MODULE: "on"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+  script:
+    - curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.18.2
+    - cd services/consumers && $(go env GOPATH)/bin/gosec ./...
+
+security-check-orders:
+  stage: static-check
+  image: golang:latest
+  variables:
+    GO111MODULE: "on"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+  script:
+    - curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.18.2
+    - cd services/orders && $(go env GOPATH)/bin/gosec ./...
+
+security-check-delivery:
+  stage: static-check
+  image: golang:latest
+  variables:
+    GO111MODULE: "on"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+  script:
+    - curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.18.2
+    - cd services/delivery && $(go env GOPATH)/bin/gosec ./...
+
+security-check-payments:
+  stage: static-check
+  image: golang:latest
+  variables:
+    GO111MODULE: "on"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+  script:
+    - curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.18.2
+    - cd services/payments && $(go env GOPATH)/bin/gosec ./...
+
+build-consumers:
+  image: docker:cli
+  stage: build-deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  services:
+    - docker:dind
+  variables:
+    DOCKER_IMAGE_NAME: haasregistry.azurecr.io/consumers:$CI_COMMIT_REF_SLUG
+  before_script:
+    - docker login -u "$AZURE_REGISTRY_USERNAME" -p "$AZURE_REGISTRY_PASSWORD" haasregistry.azurecr.io
+  # All branches are tagged with $DOCKER_IMAGE_NAME (defaults to commit ref slug)
+  # Default branch is also tagged with `latest`
+  script:
+    - cd services/consumers
+    - docker build --pull -t "$DOCKER_IMAGE_NAME" .
+    - docker push "$DOCKER_IMAGE_NAME"
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        docker tag "$DOCKER_IMAGE_NAME" haasregistry.azurecr.io/consumers:latest"
+        docker push --all-tags "haasregistry.azurecr.io/consumers:latest"
+      fi
+
+build-orders:
+  image: docker:cli
+  stage: build-deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  services:
+    - docker:dind
+  variables:
+    DOCKER_IMAGE_NAME: haasregistry.azurecr.io/orders:$CI_COMMIT_REF_SLUG
+  before_script:
+    - docker login -u "$AZURE_REGISTRY_USERNAME" -p "$AZURE_REGISTRY_PASSWORD" haasregistry.azurecr.io
+  # All branches are tagged with $DOCKER_IMAGE_NAME (defaults to commit ref slug)
+  # Default branch is also tagged with `latest`
+  script:
+    - cd services/orders
+    - docker build --pull -t "$DOCKER_IMAGE_NAME" .
+    - docker push "$DOCKER_IMAGE_NAME"
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        docker tag "$DOCKER_IMAGE_NAME" haasregistry.azurecr.io/orders:latest"
+        docker push --all-tags "haasregistry.azurecr.io/orders:latest"
+      fi
+
+build-delivery:
+  image: docker:cli
+  stage: build-deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  services:
+    - docker:dind
+  variables:
+    DOCKER_IMAGE_NAME: haasregistry.azurecr.io/delivery:$CI_COMMIT_REF_SLUG
+  before_script:
+    - docker login -u "$AZURE_REGISTRY_USERNAME" -p "$AZURE_REGISTRY_PASSWORD" haasregistry.azurecr.io
+  # All branches are tagged with $DOCKER_IMAGE_NAME (defaults to commit ref slug)
+  # Default branch is also tagged with `latest`
+  script:
+    - cd services/delivery
+    - docker build --pull -t "$DOCKER_IMAGE_NAME" .
+    - docker push "$DOCKER_IMAGE_NAME"
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        docker tag "$DOCKER_IMAGE_NAME" haasregistry.azurecr.io/delivery:latest"
+        docker push --all-tags "haasregistry.azurecr.io/delivery:latest"
+      fi
+
+build-payments:
+  image: docker:cli
+  stage: build-deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  services:
+    - docker:dind
+  variables:
+    DOCKER_IMAGE_NAME: haasregistry.azurecr.io/payments:$CI_COMMIT_REF_SLUG
+  before_script:
+    - docker login -u "$AZURE_REGISTRY_USERNAME" -p "$AZURE_REGISTRY_PASSWORD" haasregistry.azurecr.io
+  # All branches are tagged with $DOCKER_IMAGE_NAME (defaults to commit ref slug)
+  # Default branch is also tagged with `latest`
+  script:
+    - cd services/payments
+    - docker build --pull -t "$DOCKER_IMAGE_NAME" .
+    - docker push "$DOCKER_IMAGE_NAME"
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        docker tag "$DOCKER_IMAGE_NAME" haasregistry.azurecr.io/payments:latest"
+        docker push --all-tags "haasregistry.azurecr.io/payments:latest"
+      fi
+
+deploy-api-docs:
+  image: node:latest
+  stage: build-deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - npm install rdme@latest -g
+    - rdme
+      --key=$README_API_KEY
+      openapi docs/api-specs/consumers-service.json --key=$README_API_KEY --id=656809a7c17d860023ad499a
+
+    - rdme
+      --key=$README_API_KEY
+      openapi docs/api-specs/orders-service.json --key=$README_API_KEY --id=6568096dfec4a2004fa21466
+
+    - rdme
+      --key=$README_API_KEY
+      openapi docs/api-specs/payment-service.json --key=$README_API_KEY --id=65680944b254b1001cacc268
+
+    - rdme
+      --key=$README_API_KEY
+      openapi docs/api-specs/delivery-service.json --key=$README_API_KEY --id=6568098b9441db001cfb1003
