@@ -3,11 +3,10 @@ package model
 import (
 	"github.com/adrg/strutil"
 	"github.com/adrg/strutil/metrics"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Product struct {
-	ID       primitive.ObjectID `bson:"_id" json:"_id"`
+	ID       interface{}
 	Name     string
 	Category string
 	Brand    string
@@ -15,15 +14,15 @@ type Product struct {
 }
 
 type ProductNotification struct {
-	ID       string  `json:"id"`
-	Name     string  `json:"name"`
-	Category string  `json:"category"`
-	Brand    string  `json:"brand"`
-	Price    float32 `json:"price"`
+	ID       interface{} `json:"id"`
+	Name     string      `json:"name"`
+	Category string      `json:"category"`
+	Brand    string      `json:"brand"`
+	Price    float32     `json:"price"`
 }
 
 type ProductQuantity struct {
-	Product  primitive.ObjectID
+	Product  interface{}
 	Quantity int
 }
 
