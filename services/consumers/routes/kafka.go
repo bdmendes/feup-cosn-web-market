@@ -26,7 +26,7 @@ func getKafkaReader() *kafka.Reader {
 
 	topic := os.Getenv("KAFKA_PRODUCTS_TOPIC")
 	if topic == "" {
-		topic = "products"
+		topic = "purchasedproducts"
 	}
 
 	brokers := strings.Split(kafkaURL, ",")
@@ -62,7 +62,7 @@ func createOrUpdateProduct(productNotification model.ProductNotification) {
 	productsCollection := database.GetDatabase().Collection("products")
 
 	var product model.Product
-	err := productsCollection.FindOne(context.Background(), bson.M{"_id": productNotification.ID}).Decode(&product)
+	err := productsCollection.FindOne(context.Background(), bson.M{"id": productNotification.ID}).Decode(&product)
 	if err != nil { // create product
 		product.ID = productNotification.ID
 		product.Category = productNotification.Category
@@ -80,7 +80,7 @@ func createOrUpdateProduct(productNotification model.ProductNotification) {
 		product.Prices = append(product.Prices, productNotification.Price)
 
 		if _, err = productsCollection.UpdateOne(context.Background(),
-			bson.M{"_id": productNotification.ID}, bson.M{"$set": product}); err != nil {
+			bson.M{"id": productNotification.ID}, bson.M{"$set": product}); err != nil {
 			fmt.Printf("error updating product: %v\n", err)
 		}
 	}
