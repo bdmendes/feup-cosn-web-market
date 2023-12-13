@@ -48,7 +48,7 @@ func populateProductsView() {
 			return
 		}
 
-		var products []map[string]interface{}
+		var products []model.ProductNotification
 		err = json.Unmarshal(b, &products)
 		if err != nil {
 			fmt.Println("Error unmarshalling response body:", err)
@@ -61,15 +61,26 @@ func populateProductsView() {
 		productsCollection := database.GetDatabase().Collection("products")
 		for _, product := range products {
 			var productModel model.Product
+			productModel.ID = product.ID
+			productModel.Name = product.Name
 
-			productModel.Name = product["name"].(string)
-			productModel.ID = fmt.Sprintf("%f", product["id"].(float64))
+			if productModel.Category != "" {
+				productModel.Category = product.Category
+			}
 
-			_, err = productsCollection.InsertOne(ctx, productModel)
+			if productModel.Brand != "" {
+				productModel.Brand = product.Brand
+			}
+
+			if productModel.Prices != nil {
+				productModel.Prices = []float32{product.Price}
+			}
+
+			_, err = productsCollection.InsertOne(ctx, product)
 			if err != nil {
 				fmt.Println("Error inserting product:", err)
 			} else {
-				fmt.Println("Inserted product", productModel.Name)
+				fmt.Println("Inserted product", product.Name)
 			}
 		}
 	})
