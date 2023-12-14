@@ -149,6 +149,13 @@ We rely on the API gateway functionality to ensure all incoming requests to our 
 
 On top of this, we use *GoSec*, a static source code analyzer that checks for common issues such as DoS vulnerabilities, hardcoded credentials or out of bounds accesses. It has helped to solve code smells that could lead to service denials or data exploitation in extreme edge cases.
 
+## Deployment
+To ease building and deploying our services, we containerized them. This allows for seamless integration of new versions. We leverage CI/CD pipelines (both on our GitHub and GitLab repositories) to automatically analyze code and build and deploy new versions of our services to the image registry.
+
+The services are hosted in Azure with the [container apps service](https://azure.microsoft.com/en-us/products/container-apps/) that uses Kubernetes under the hood. This allows us to easily scale the services horizontally and to achieve high availability and fault tolerance. [MongoDB Atlas](https://www.mongodb.com/atlas) is used to host the databases of each service.
+
+Ideally our services would only be accessed through an API gateway, which should log requests and handle authentication and authorization. However, due to time constraints and for simplicity sake, we expose the services directly to the internet. Reconfiguring the services to only accept requests from the API gateway is trivial and should be done in a real-world scenario.
+
 ## Conclusion
 
 Our subset of *HaaS* is as of now a reliable subsystem that fullfills the initial base requirements (MVP) and is thus able to be shipped. We also pointed out future work, such as security enhancements, that we feel will improve the quality of the product further in the future.
