@@ -7,11 +7,16 @@
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:8001"
+      "description": "API gateway",
+      "url": "https://cosn-webmarket-apim-rg-ne.azure-api.net/delivery"
     },
     {
       "description": "Production server",
-      "url": "http://delivery.gentlesea-f6ac112d.westeurope.azurecontainerapps.io"
+      "url": "https://delivery.gentlesea-f6ac112d.westeurope.azurecontainerapps.io"
+    },
+    {
+      "description": "Local environment",
+      "url": "http://127.0.0.1:8001"
     }
   ],
   "components": {
@@ -149,12 +154,44 @@
           "$ref": "#/components/parameters/orderId"
         }
       ]
+    },
+    "/health":{
+      "get": {
+        "tags": [
+          "Observability"
+        ],
+        "summary": "Get health status",
+        "description": "Get health status",
+        "operationId": "getHealthStatus",
+        "responses": {
+          "200": {
+            "description": "Health status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "tags": [
     {
       "name": "Delivery",
       "description": "Delivery operations"
+    },
+    {
+      "name": "Observability",
+      "description": "Observability operations"
     }
   ]
 }

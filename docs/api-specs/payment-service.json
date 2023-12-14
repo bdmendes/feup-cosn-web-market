@@ -1,105 +1,141 @@
 {
-    "openapi": "3.0.3",
-    "info": {
-        "title": "Payment service",
-        "version": "1.0.0"
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Payment service",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "description": "API gateway",
+      "url": "https://cosn-webmarket-apim-rg-ne.azure-api.net/payment"
     },
-    "servers": [
-        {
-            "url": "http://127.0.0.1:8002",
-            "description": "Local server"
-        },
-        {
-          "description": "Production server",
-          "url": "http://payments.gentlesea-f6ac112d.westeurope.azurecontainerapps.io"
+    {
+      "description": "Production server",
+      "url": "http://payments.gentlesea-f6ac112d.westeurope.azurecontainerapps.io"
+    },
+    {
+      "description": "Local environment",
+      "url": "http://127.0.0.1:8002"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Payment": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "example": 12.5
+          },
+          "payment_data": {
+            "type": "string",
+            "example": "1234123412341234"
+          },
+          "payment_method": {
+            "type": "string",
+            "enum": [
+              "paypal",
+              "credit_card"
+            ],
+            "example": "paypal"
+          }
         }
-    ],
-    "components": {
-        "schemas": {
-            "Payment": {
-                "type": "object",
-                "properties": {
-                  "amount": {
-                    "type": "number",
-                    "example": 12.5
-                  },
-                  "payment_data": {
-                    "type": "string",
-                    "example": "1234123412341234"
-                  },
-                  "payment_method": {
-                    "type": "string",
-                    "enum": [
-                      "paypal",
-                      "credit_card"
-                    ],
-                    "example": "paypal"
+      }
+    }
+  },
+  "paths": {
+    "/payment": {
+      "post": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "Pay order",
+        "description": "Pay order",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Payment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "Payment status",
+                      "example": "Payment successful"
+                    }
                   }
                 }
               }
-        }
-    },
-    "paths": {
-        "/payment": {
-            "post": {
-                "tags": [
-                    "Payment"
-                ],
-                "summary": "Pay order",
-                "description": "Pay order",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Payment"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Payment successful",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "description": "Payment status",
-                                            "example": "Payment successful"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Payment failed",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "error": {
-                                            "type": "string",
-                                            "description": "Error message",
-                                            "example": "payment failed. try again later"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
             }
+          },
+          "500": {
+            "description": "Payment failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "payment failed. try again later"
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
+      }
     },
-    "tags": [
-        {
-            "name": "Payment",
-            "description": "Payment operations"
+    "/health": {
+      "get": {
+        "tags": [
+          "Observability"
+        ],
+        "summary": "Get health status",
+        "description": "Get health status",
+        "operationId": "getHealthStatus",
+        "responses": {
+          "200": {
+            "description": "Health status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
-    ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Payment",
+      "description": "Payment operations"
+    },
+    {
+      "name": "Observability",
+      "description": "Observability operations"
+    }
+  ]
 }
