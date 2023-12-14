@@ -140,7 +140,7 @@ func paymentCallback(resp *http.Response, data map[string]interface{}) {
 			`}`)
 
 		go PublishOrder(order)
-		go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL")+"/delivery", deliveryCallback, data)
+		go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL"), deliveryCallback, data)
 	} else {
 		fmt.Println("Payment failed: ", resp.Status)
 	}
@@ -262,7 +262,7 @@ func updateOrder(c *gin.Context) {
 			`", "location": "` + order.Location +
 			`", "express_delivery": ` + strconv.FormatBool(order.ExpressDelivery) +
 			`}`)
-		go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL")+"/delivery", deliveryCallback, map[string]interface{}{"order_id": order_id.Hex()})
+		go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL"), deliveryCallback, map[string]interface{}{"order_id": order_id.Hex()})
 	}
 }
 
