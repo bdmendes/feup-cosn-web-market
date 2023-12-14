@@ -72,6 +72,7 @@ func createOrUpdateProduct(productNotification model.ProductNotification) {
 
 		if _, err = productsCollection.InsertOne(context.Background(), product); err != nil {
 			fmt.Printf("error inserting product: %v\n", err)
+			return
 		}
 	} else { // update product
 		product.Category = productNotification.Category
@@ -82,8 +83,53 @@ func createOrUpdateProduct(productNotification model.ProductNotification) {
 		if _, err = productsCollection.UpdateOne(context.Background(),
 			bson.M{"id": productNotification.ID}, bson.M{"$set": product}); err != nil {
 			fmt.Printf("error updating product: %v\n", err)
+			return
 		}
 	}
+
+	go createOrUpdatePriceDropNotification(product)
+}
+
+func createOrUpdatePriceDropNotification(product model.Product) {
+	if (product.Prices[len(product.Prices)-1] - product.Prices[len(product.Prices)-2]) >= 0 {
+		return
+	}
+	consumersCollection := database.GetDatabase().Collection("consumers")
+	cursor, err := consumersCollection.Find(context.Background(), bson.M{"watchedProducts": product.ID})
+	if err != nil {
+		panic("Failed to get consumers: " + err.Error())
+	}
+
+	var consumers []model.Consumer
+	err = cursor.All(context.Background(), &consumers)
+	if err != nil {
+		panic("Failed to get consumers: " + err.Error())
+	}
+
+	notificationsCollection := database.GetDatabase().Collection("notifications")
+	for _, consumer := range consumers {
+		var notification model.PriceDropNotification
+		err = notificationsCollection.FindOne(context.Background(), bson.M{"consumerId": consumer.ID, "productId": product.ID}).Decode(&notification)
+		if err != nil {
+			notification.ConsumerID = consumer.ID
+			notification.ProductID = product.ID
+			notification.OldPrice = product.Prices[len(product.Prices)-2]
+			notification.NewPrice = product.Prices[len(product.Prices)-1]
+
+			if _, err = notificationsCollection.InsertOne(context.Background(), notification); err != nil {
+				fmt.Printf("error inserting notification: %v\n", err)
+			}
+		} else {
+			notification.OldPrice = product.Prices[len(product.Prices)-2]
+			notification.NewPrice = product.Prices[len(product.Prices)-1]
+
+			if _, err = notificationsCollection.UpdateOne(context.Background(),
+				bson.M{"consumerId": consumer.ID, "productId": product.ID}, bson.M{"$set": notification}); err != nil {
+				fmt.Printf("error updating notification: %v\n", err)
+			}
+		}
+	}
+
 }
 
 // How to run Kafka:
