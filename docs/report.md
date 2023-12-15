@@ -70,9 +70,17 @@ The recommendations module suggests a list of products to a consumer based on th
 
 ### Orders
 
-The Order Service, a pivotal microservice, is responsible for overseeing the comprehensive order processing workflow within the system. Beyond its primary function of receiving new orders, this service plays a fundamental role in the communication with the Payment Service for order validation and with the Delivery Service to facilitate the shipment of purchases. 
+The Order Service, a pivotal microservice, is responsible for overseeing the comprehensive order processing workflow within the system. Beyond its primary function of receiving new orders, this service plays a fundamental role in the communication with the Payment Service for order validation and with the Delivery Service to facilitate the shipment of purchases.
+
+#### Order processing
+
 To automate order processing, interactions with the payment and delivery services are triggered upon order creation and successful payment processing, respectively.
 Finally, upon successful payment processing, is published a message in the broker to notify other services about the ordered products. This is particularly useful to update product stock.
+
+#### Scheduled Order
+
+In the Order Service, users have the option to reorder previous purchases through the creation of scheduled orders. This functionality allows for a convenient and efficient way to replicate and schedule orders for a more seamless ordering process. The scheduled order mirrors a regular one, differing only in a single parameter: the number of days between each reorder. 
+Finally, the service incorporates a chronological job, operating on a separate thread, which periodically checks for new orders to be created. 
 
 To facilitate the management of each order, there are 5 different states to control the process flow:
 
