@@ -16,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func sendPostRequest(payload []byte, url string, callback func(*http.Response, map[string]interface{}), data map[string]interface{}) {
+func SendPostRequest(payload []byte, url string, callback func(*http.Response, map[string]interface{}), data map[string]interface{}) {
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 	if err != nil {
 		fmt.Println("Error creating request:", err)
@@ -109,7 +109,7 @@ func getClientOrders(c *gin.Context) {
 	c.JSON(http.StatusOK, orders)
 }
 
-func paymentCallback(resp *http.Response, data map[string]interface{}) {
+func PaymentCallback(resp *http.Response, data map[string]interface{}) {
 	if resp.StatusCode == http.StatusOK {
 		order_id, err := primitive.ObjectIDFromHex(data["order_id"].(string))
 		if err != nil {
@@ -140,14 +140,14 @@ func paymentCallback(resp *http.Response, data map[string]interface{}) {
 			`}`)
 
 		go PublishOrder(order)
-		go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL"), deliveryCallback, data)
+		go SendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL"), deliveryCallback, data)
 	} else {
 		fmt.Println("Payment failed: ", resp.Status)
 	}
 }
 
 func deliveryCallback(resp *http.Response, data map[string]interface{}) {
-	if resp.StatusCode == http.StatusOK {
+	if resp.StatusCode == http.StatusCreated {
 		order_id, err := primitive.ObjectIDFromHex(data["order_id"].(string))
 		if err != nil {
 			fmt.Println("Error: invalid order_id")
@@ -198,7 +198,7 @@ func createOrder(c *gin.Context) {
 		`, "payment_method": "` + order.PaymentData.PaymentMethod +
 		`", "payment_data": "` + order.PaymentData.PaymentData +
 		`"}`)
-	go sendPostRequest(payload, os.Getenv("PAYMENT_SERVICE_URL")+"/payment", paymentCallback, map[string]interface{}{"order_id": order.ID.Hex()})
+	go SendPostRequest(payload, os.Getenv("PAYMENT_SERVICE_URL")+"/payment", PaymentCallback, map[string]interface{}{"order_id": order.ID.Hex()})
 }
 
 func updateOrder(c *gin.Context) {
@@ -256,13 +256,13 @@ func updateOrder(c *gin.Context) {
 			`, "payment_method": "` + order.PaymentData.PaymentMethod +
 			`", "payment_data": "` + order.PaymentData.PaymentData +
 			`"}`)
-		go sendPostRequest(payload, os.Getenv("PAYMENT_SERVICE_URL")+"/payment", paymentCallback, map[string]interface{}{"order_id": order_id.Hex()})
+		go SendPostRequest(payload, os.Getenv("PAYMENT_SERVICE_URL")+"/payment", PaymentCallback, map[string]interface{}{"order_id": order_id.Hex()})
 	} else if order.Status == model.AUTHORIZED && updateOrderRequest.Status != nil && *(updateOrderRequest.Status) == model.SHIPPED {
 		payload := []byte(`{"order_id": "` + order_id.Hex() +
 			`", "location": "` + order.Location +
 			`", "express_delivery": ` + strconv.FormatBool(order.ExpressDelivery) +
 			`}`)
-		go sendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL"), deliveryCallback, map[string]interface{}{"order_id": order_id.Hex()})
+		go SendPostRequest(payload, os.Getenv("DELIVERY_SERVICE_URL"), deliveryCallback, map[string]interface{}{"order_id": order_id.Hex()})
 	}
 }
 

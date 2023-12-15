@@ -14,7 +14,7 @@ type Consumer struct {
 	ID              primitive.ObjectID `json:"_id" bson:"_id"`
 	Name            string
 	Location        string
-	WatchedProducts []primitive.ObjectID
+	WatchedProducts []interface{}
 	ShoppingCart    []ProductQuantity
 	OrderHistory    []ProductQuantity
 }
