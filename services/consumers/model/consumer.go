@@ -14,7 +14,7 @@ type Consumer struct {
 	ID              primitive.ObjectID `json:"_id" bson:"_id"`
 	Name            string
 	Location        string
-	WatchedProducts []primitive.ObjectID
+	WatchedProducts []interface{}
 	ShoppingCart    []ProductQuantity
 	OrderHistory    []ProductQuantity
 }
@@ -30,7 +30,7 @@ func (consumer *Consumer) RelatedProducts(c *gin.Context) []Product {
 	for _, productQuantity := range consumer.ShoppingCart {
 		var product Product
 		if err := database.GetDatabase().Collection("products").FindOne(c,
-			bson.M{"_id": productQuantity.Product}).Decode(&product); err != nil {
+			bson.M{"id": productQuantity.Product}).Decode(&product); err != nil {
 			panic("Failed to get product: " + err.Error())
 		}
 		products = append(products, product)
@@ -39,7 +39,7 @@ func (consumer *Consumer) RelatedProducts(c *gin.Context) []Product {
 	for _, productQuantity := range consumer.OrderHistory {
 		var product Product
 		if err := database.GetDatabase().Collection("products").FindOne(c,
-			bson.M{"_id": productQuantity.Product}).Decode(&product); err != nil {
+			bson.M{"id": productQuantity.Product}).Decode(&product); err != nil {
 			panic("Failed to get product: " + err.Error())
 		}
 		products = append(products, product)
@@ -48,7 +48,7 @@ func (consumer *Consumer) RelatedProducts(c *gin.Context) []Product {
 	for _, watchedProduct := range consumer.WatchedProducts {
 		var product Product
 		if err := database.GetDatabase().Collection("products").FindOne(c,
-			bson.M{"_id": watchedProduct}).Decode(&product); err != nil {
+			bson.M{"id": watchedProduct}).Decode(&product); err != nil {
 			panic("Failed to get product: " + err.Error())
 		}
 
@@ -56,7 +56,7 @@ func (consumer *Consumer) RelatedProducts(c *gin.Context) []Product {
 	}
 
 	var latestProducts []Product
-	opts := options.Find().SetLimit(20).SetSort(bson.M{"_id": -1})
+	opts := options.Find().SetLimit(20).SetSort(bson.M{"id": -1})
 	cursor, err := database.GetDatabase().Collection("products").Find(c, bson.M{}, opts)
 	if err != nil {
 		panic("Failed to get products: " + err.Error())

@@ -34,7 +34,7 @@ func getAllNotificationsForConsumer(c *gin.Context) {
 	}
 
 	if len(notifications) == 0 {
-		c.JSON(http.StatusNoContent, gin.H{})
+		c.Status(http.StatusNoContent)
 		return
 	}
 
@@ -50,11 +50,7 @@ func registerForPriceNotification(c *gin.Context) {
 		return
 	}
 
-	productId, err := primitive.ObjectIDFromHex(c.Param("productId"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	productId := c.Param("productId")
 
 	_, err = consumersCollection.UpdateOne(c, bson.M{"_id": consumerId},
 		bson.M{"$addToSet": bson.M{"watchedProducts": productId}})

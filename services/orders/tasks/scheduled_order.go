@@ -4,6 +4,9 @@ import (
 	"context"
 	"cosn/orders/database"
 	"cosn/orders/model"
+	"cosn/orders/routes"
+	"os"
+	"strconv"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -57,6 +60,13 @@ func ScheduledOrdersTask() {
 					println("Order Task: " + err.Error())
 					break
 				}
+
+				payload := []byte(`{"amount": ` + strconv.FormatFloat(new_order.PaymentData.Amount, 'f', -1, 64) +
+					`, "payment_method": "` + new_order.PaymentData.PaymentMethod +
+					`", "payment_data": "` + new_order.PaymentData.PaymentData +
+					`"}`)
+
+				go routes.SendPostRequest(payload, os.Getenv("PAYMENT_SERVICE_URL")+"/payment", routes.PaymentCallback, map[string]interface{}{"order_id": new_order.ID.Hex()})
 			}
 		}
 	}
