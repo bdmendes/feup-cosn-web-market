@@ -100,6 +100,6 @@ func markDeliveryAsDone(c *gin.Context) {
 
 func AddDeliveryRoutes(rg *gin.RouterGroup) {
 	rg.GET("/:orderId", getDeliveryData)
-	rg.POST("/", createDelivery)
+	rg.POST("", createDelivery)
 	rg.POST("/:orderId/markAsDone", markDeliveryAsDone)
 }

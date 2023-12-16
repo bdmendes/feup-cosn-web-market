@@ -36,5 +36,5 @@ func payOrder(c *gin.Context) {
 }
 
 func AddPaymentRoutes(routerGroup *gin.RouterGroup) {
-	routerGroup.POST("/", payOrder)
+	routerGroup.POST("", payOrder)
 }

@@ -267,8 +267,8 @@ func updateOrder(c *gin.Context) {
 }
 
 func AddOrdersRoutes(routerGroup *gin.RouterGroup) {
-	routerGroup.GET("/", getOrders)
-	routerGroup.POST("/", createOrder)
+	routerGroup.GET("", getOrders)
+	routerGroup.POST("", createOrder)
 
 	routerGroup.GET("/:id", getOrder)
 	routerGroup.PUT("/:id", updateOrder)
