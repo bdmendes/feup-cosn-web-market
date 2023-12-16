@@ -14,11 +14,12 @@ type Product struct {
 }
 
 type ProductNotification struct {
-	ID       interface{} `json:"id"`
+	ID       interface{} `json:"product_id"`
 	Name     string      `json:"name"`
 	Category string      `json:"category"`
 	Brand    string      `json:"brand"`
 	Price    float32     `json:"price"`
+	Quantity int64       `json:"quantity"`
 }
 
 type ProductQuantity struct {

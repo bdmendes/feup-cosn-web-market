@@ -16,6 +16,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func sendGetRequest(url string, callback func(*http.Response)) {
@@ -48,8 +50,8 @@ func populateProductsView() {
 			return
 		}
 
-		var products []model.ProductNotification
-		err = json.Unmarshal(b, &products)
+		var updatedProductsView []model.ProductNotification
+		err = json.Unmarshal(b, &updatedProductsView)
 		if err != nil {
 			fmt.Println("Error unmarshalling response body:", err)
 			return
@@ -59,24 +61,30 @@ func populateProductsView() {
 		defer cancel()
 
 		productsCollection := database.GetDatabase().Collection("products")
-		for _, product := range products {
+
+		for _, product := range updatedProductsView {
 			var productModel model.Product
-			productModel.ID = product.ID
-			productModel.Name = product.Name
+			if err = productsCollection.FindOne(ctx, bson.M{"id": product.ID}).Decode(&productModel); err == nil {
+				if product.Name != "" {
+					productModel.Name = product.Name
+				}
 
-			if productModel.Category != "" {
 				productModel.Category = product.Category
-			}
-
-			if productModel.Brand != "" {
 				productModel.Brand = product.Brand
-			}
-
-			if productModel.Prices != nil {
+				if productModel.Prices[len(productModel.Prices)-1] != product.Price {
+					productModel.Prices = append(productModel.Prices, product.Price)
+				}
+			} else {
+				productModel.ID = product.ID
+				productModel.Name = product.Name
+				productModel.Category = product.Category
+				productModel.Brand = product.Brand
 				productModel.Prices = []float32{product.Price}
 			}
 
-			_, err = productsCollection.InsertOne(ctx, product)
+			opts := options.Update().SetUpsert(true)
+			_, err = productsCollection.UpdateOne(ctx, bson.M{"id": product.ID}, bson.M{"$set": productModel}, opts)
+
 			if err != nil {
 				fmt.Println("Error inserting product:", err)
 			} else {
