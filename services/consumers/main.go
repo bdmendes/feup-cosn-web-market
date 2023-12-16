@@ -64,22 +64,20 @@ func populateProductsView() {
 
 		for _, product := range updatedProductsView {
 			var productModel model.Product
-			if err = productsCollection.FindOne(ctx, bson.M{"id": product.ID}).Decode(&productModel); err == nil {
-				if product.Name != "" {
-					productModel.Name = product.Name
-				}
+			productModel.ID = product.ID
+			if product.Name != "" {
+				productModel.Name = product.Name
+			}
+			productModel.Category = product.Category
+			productModel.Brand = product.Brand
+			productModel.Prices = []float32{product.Price}
 
-				productModel.Category = product.Category
-				productModel.Brand = product.Brand
+			if err = productsCollection.FindOne(ctx, bson.M{"id": product.ID}).Decode(&productModel); err == nil {
 				if productModel.Prices[len(productModel.Prices)-1] != product.Price {
 					productModel.Prices = append(productModel.Prices, product.Price)
 				}
 			} else {
-				productModel.ID = product.ID
 				productModel.Name = product.Name
-				productModel.Category = product.Category
-				productModel.Brand = product.Brand
-				productModel.Prices = []float32{product.Price}
 			}
 
 			opts := options.Update().SetUpsert(true)
