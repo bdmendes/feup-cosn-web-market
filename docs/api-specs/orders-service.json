@@ -25,11 +25,10 @@
       "ProductQuantity": {
         "type": "object",
         "properties": {
-          "Product": {
-            "type": "string",
-            "example": "65668e55a3f8dfb5ef137c86"
+          "product_id": {
+            "example": 2
           },
-          "Quantity": {
+          "quantity": {
             "type": "number",
             "example": 1
           }
