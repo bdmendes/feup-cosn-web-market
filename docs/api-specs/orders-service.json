@@ -26,7 +26,8 @@
         "type": "object",
         "properties": {
           "product_id": {
-            "example": 2
+            "type": "number",
+            "example": 1
           },
           "quantity": {
             "type": "number",
